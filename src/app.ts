@@ -1,1 +1,3 @@
-console.log("hello worl");
+import express { Request, Response, NextFunction } from "express";
+
+const app = express();
