@@ -15,8 +15,4 @@ const Logger = w.createLogger({
   transports: [new w.transports.Console()]
 })
 
-Logger.info('info message')
-Logger.error('error message')
-Logger.warn('warning message')
-
 export default Logger
