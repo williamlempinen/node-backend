@@ -1,3 +1,3 @@
-import express { Request, Response, NextFunction } from "express";
+import express, { nextfunction, request, response } from 'express'
 
-const app = express();
+const app = express()
