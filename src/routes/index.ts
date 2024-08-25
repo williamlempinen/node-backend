@@ -1,16 +1,18 @@
 import * as E from 'express'
 import testGet from './test/indexGet'
 import testPost from './test/indexPost'
-import postgresClient from '../database'
+import testDatabase from './test/testDatabase'
 
-const router = E.Router()
+const rootRouter = E.Router()
 
-router.get('/', async (request: E.Request, response: E.Response) => {
-  const result = await postgresClient.query('SELECT NOW()')
-  response.send(`Hello world in router root index.ts, result: ${JSON.stringify(result)}`)
+rootRouter.get('/', async (request: E.Request, response: E.Response) => {
+  response.send(`Hello world in router root index.ts`)
 })
 
-router.use('/test', testGet)
-router.use('/test', testPost)
+// ------------------ TESTING --------------------
+rootRouter.use('/test', testGet)
+rootRouter.use('/test', testPost)
+rootRouter.use('/test', testDatabase)
+// -----------------------------------------------
 
-export default router
+export default rootRouter
