@@ -1,20 +1,58 @@
-import pg from 'pg'
-import { postgresDB as db } from '../config'
 import Logger from '../core/Logger'
+import { PrismaClient } from '@prisma/client'
 
-const { Client } = pg
-
-const postgresClient = new Client({
-  user: db.user,
-  password: db.password,
-  host: db.host,
-  port: db.port,
-  database: db.database
+const prismaClient = new PrismaClient({
+  log: [
+    {
+      emit: 'event',
+      level: 'query'
+    },
+    {
+      emit: 'event',
+      level: 'info'
+    },
+    {
+      emit: 'event',
+      level: 'warn'
+    },
+    {
+      emit: 'event',
+      level: 'error'
+    }
+  ],
+  errorFormat: 'pretty'
 })
 
-postgresClient
-  .connect()
-  .then(() => Logger.info('Connected to PostgreSQL database'))
-  .catch((error: Error) => Logger.error(`PostgreSQL conneection error: ${error.stack}`))
+Logger.info('Connected to databse')
 
-export default postgresClient
+prismaClient.$on('query', (event: any) => {
+  Logger.debug(`Query: ${event.query}`)
+  Logger.debug(`Params: ${event.params}`)
+  Logger.debug(`Duration: ${event.duration}ms`)
+})
+
+prismaClient.$on('info', (event) => {
+  Logger.info(event.message)
+})
+
+prismaClient.$on('warn', (event) => {
+  Logger.warn(event.message)
+})
+
+prismaClient.$on('error', (event) => {
+  Logger.error(event.message)
+})
+
+process.on('SIGINT', async () => {
+  await prismaClient.$disconnect()
+  Logger.info('Prisma client disconnected')
+  process.exit(0)
+})
+
+process.on('SIGTERM', async () => {
+  await prismaClient.$disconnect()
+  Logger.info('Prisma client disconnected')
+  process.exit(0)
+})
+
+export default prismaClient
