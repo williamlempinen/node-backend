@@ -20,8 +20,10 @@ model User {
 
   refreshTokens      RefreshToken[] @relation("UserRefreshTokens")
 
-  @@index([email], name: "users_email_key")
-  @@index([username], name: "users_username_key")
+  @@index([email], map: "index_users_email")
+  @@index([username], map: "index_users_username")
+
+  @@map("users")
 }
 
 model RefreshToken {
@@ -33,5 +35,7 @@ model RefreshToken {
 
   user       User     @relation("UserRefreshTokens", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@index([user_id], name: "idx_refresh_tokens_user_id")
+  @@index([user_id], map: "idx_refresh_tokens_user_id")
+
+  @@map("refresh_tokens")
 }
