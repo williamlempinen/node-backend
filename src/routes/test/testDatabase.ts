@@ -1,5 +1,5 @@
 import * as E from 'express'
-import { UserRepo } from '../../database/repository/UserRepo'
+import UserRepo from '../../database/repository/UserRepo'
 
 const router = E.Router()
 

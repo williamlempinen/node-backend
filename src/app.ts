@@ -3,6 +3,7 @@ import Logger from './core/Logger'
 import cors from 'cors'
 import rootRouter from './routes'
 import { connectToDatabase } from './database'
+import { connectRedis } from './cache'
 
 const app = express()
 
@@ -12,6 +13,7 @@ app.use(express.json())
 app.use(cors())
 
 connectToDatabase()
+connectRedis()
 
 app.use('/', rootRouter)
 
