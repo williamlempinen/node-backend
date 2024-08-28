@@ -13,9 +13,12 @@ const UserRepo = {
     }
   },
 
-  async registerUser(data: P.UserCreateInput): Promise<UserDTO | null> {
+  async registerUser(
+    data: P.UserCreateInput
+  ): Promise<{ user: UserDTO; accessToken: string; refreshToken: string } | null> {
     try {
-      return await prisma.user.create({ data })
+      return null
+      //return await prisma.user.create({ data })
     } catch (error: any) {
       Logger.error(`Error creating registering new user: ${error}`)
       return null
