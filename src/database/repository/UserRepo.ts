@@ -63,7 +63,7 @@ const UserRepo = {
         expires_at: expiresAt
       })
 
-      return { user: userDTO, accessToken: accessToken, refreshToken: refreshToken }
+      return { user: userDTO, accessToken, refreshToken }
     } catch (error: any) {
       Logger.error(`Error creating registering new user: ${error}`)
       return null

@@ -1,11 +1,13 @@
-import * as E from 'express'
+import express, { Request, Response } from 'express'
 import testGet from './test/indexGet'
 import testPost from './test/indexPost'
 import testDatabase from './test/testDatabase'
 
-const rootRouter = E.Router()
+import signup from './access/singup'
 
-rootRouter.get('/', async (request: E.Request, response: E.Response) => {
+const rootRouter = express.Router()
+
+rootRouter.get('/', async (request: Request, response: Response) => {
   response.send(`Hello world in router root index.ts`)
 })
 
@@ -14,5 +16,7 @@ rootRouter.use('/test', testGet)
 rootRouter.use('/test', testPost)
 rootRouter.use('/test', testDatabase)
 // -----------------------------------------------
+
+rootRouter.use('/access', signup)
 
 export default rootRouter
