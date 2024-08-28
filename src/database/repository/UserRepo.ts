@@ -1,33 +1,26 @@
-import prismaClient from '..'
-import { User } from '@prisma/client'
+import { prismaClient as prisma } from '..'
+import { User, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
+import { UserDTO } from '../models/UserDTOs'
 
-type CreateUserType = Omit<User, 'id' | 'created_at' | 'updated_at'>
-
-export class UserRepo {
-  static async findAll(): Promise<User[] | null> {
+const UserRepo = {
+  async findAll(): Promise<User[] | null> {
     try {
-      const allUsers = prismaClient.user.findMany()
-
-      Logger.info('Finding all users')
-      return allUsers
+      return await prisma.user.findMany()
     } catch (error: any) {
-      Logger.error(`Error finding all users: ${error}`)
+      Logger.error(`Error occured while finding all users: ${error}`)
       return null
     }
-  }
+  },
 
-  static async registerUser(data: CreateUserType): Promise<User | null> {
+  async registerUser(data: P.UserCreateInput): Promise<UserDTO | null> {
     try {
-      const newUser = await prismaClient.user.create({
-        data
-      })
-
-      Logger.info(`New user registered with username: ${newUser.username}`)
-      return newUser
+      return await prisma.user.create({ data })
     } catch (error: any) {
-      Logger.error(`Error registering new user: ${error.message}`)
+      Logger.error(`Error creating registering new user: ${error}`)
       return null
     }
   }
 }
+
+export default UserRepo

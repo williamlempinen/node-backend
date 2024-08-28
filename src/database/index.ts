@@ -1,7 +1,7 @@
 import Logger from '../core/Logger'
 import { PrismaClient } from '@prisma/client'
 
-const prismaClient = new PrismaClient({
+export const prismaClient = new PrismaClient({
   log: [
     {
       emit: 'event',
@@ -23,16 +23,19 @@ const prismaClient = new PrismaClient({
   errorFormat: 'pretty'
 })
 
-Logger.info('Connected to databse')
+export const connectToDatabase = async () => {
+  try {
+    await prismaClient.$connect()
+    Logger.info('Connected to databse')
+  } catch (error: any) {
+    Logger.error(`Couldn't connect to database: ${error}`)
+  }
+}
 
 prismaClient.$on('query', (event: any) => {
   Logger.debug(`Query: ${event.query}`)
   Logger.debug(`Params: ${event.params}`)
   Logger.debug(`Duration: ${event.duration}ms`)
-})
-
-prismaClient.$on('info', (event) => {
-  Logger.info(event.message)
 })
 
 prismaClient.$on('warn', (event) => {
@@ -54,5 +57,3 @@ process.on('SIGTERM', async () => {
   Logger.info('Prisma client disconnected')
   process.exit(0)
 })
-
-export default prismaClient
