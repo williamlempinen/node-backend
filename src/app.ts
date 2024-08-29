@@ -4,6 +4,7 @@ import cors from 'cors'
 import rootRouter from './routes'
 import { connectToDatabase } from './database'
 import { connectRedis } from './cache'
+import ErrorMiddleware from './core/ErrorMiddleware'
 
 const app = express()
 
@@ -16,5 +17,7 @@ connectToDatabase()
 connectRedis()
 
 app.use('/', rootRouter)
+
+app.use(ErrorMiddleware)
 
 export default app
