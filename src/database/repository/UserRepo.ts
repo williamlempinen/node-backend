@@ -5,6 +5,7 @@ import { UserDTO } from '../models/UserDTOs'
 import { createToken } from '../../auth/JWT'
 import crypto from 'crypto'
 import RefreshTokenRepo from './RefreshTokenRepo'
+import { hashPassword } from '../../core/utils'
 
 const UserRepo = {
   async findByEmail(email: string): Promise<UserDTO | null> {
@@ -42,7 +43,9 @@ const UserRepo = {
       const exists = await UserRepo.findByEmail(data.email)
       if (exists) return null
 
-      const user = await prisma.user.create({ data })
+      const hashedPassword = hashPassword(data.password)
+
+      const user = await prisma.user.create({ data: { ...data, password: hashedPassword } })
 
       const userDTO: UserDTO = {
         id: user.id,
