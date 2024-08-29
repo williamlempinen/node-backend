@@ -51,7 +51,7 @@ const UserRepo = {
 
       return { user: userDTO, accessToken, refreshToken }
     } catch (error: any) {
-      Logger.error(`Error creating registering new user: ${error}`)
+      Logger.error(`Error registering new user: ${error}`)
       return null
     }
   },

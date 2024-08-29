@@ -9,7 +9,7 @@ const ErrorMiddleware = (error: any, request: Request, response: Response, next:
     return HandleError(error.type, error.message || 'An error occurred', response)
   }
 
-  return HandleError(ErrorType.INTERNAL, 'An unexpected error occurred', response)
+  return HandleError(ErrorType.INTERNAL, 'An unexpected error occurred (super general)', response)
 }
 
 export default ErrorMiddleware

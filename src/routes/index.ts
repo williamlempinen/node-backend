@@ -6,6 +6,7 @@ import testDatabase from './test/testDatabase'
 
 import signup from './access/singup'
 import login from './access/login'
+import logout from './access/logout'
 import UserRepo from '../database/repository/UserRepo'
 
 const rootRouter = express.Router()
@@ -30,6 +31,7 @@ rootRouter.get('/access', async (request: Request, response: Response) => {
 
 rootRouter.use('/access', signup)
 rootRouter.use('/access', login)
+rootRouter.use('/access', logout)
 // -----------------------------------------------
 
 export default rootRouter

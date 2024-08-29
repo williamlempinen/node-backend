@@ -3,6 +3,8 @@ import crypto from 'crypto'
 import { createJwtToken } from '../auth/JWT'
 import RefreshTokenRepo from '../database/repository/RefreshTokenRepo'
 import { UserDTO } from '../database/models/UserDTOs'
+import { prismaClient as prisma } from '../database'
+import Logger from './Logger'
 
 type Tokens = {
   accessToken: string
@@ -33,3 +35,26 @@ export const createTokens = async (userDTO: UserDTO): Promise<Tokens> => {
 
   return { accessToken, refreshToken }
 }
+
+export const deleteExpiredRefreshTokens = async () => {
+  try {
+    const now = new Date()
+    const result = await prisma.refreshToken.deleteMany({
+      where: {
+        expires_at: {
+          lt: now
+        }
+      }
+    })
+
+    Logger.info('Running checks')
+
+    if (result.count > 0) {
+      Logger.info(`Deleted ${result.count} expired refresh tokens.`)
+    }
+  } catch (error: any) {
+    Logger.error(`Failed to delete expired refresh tokens: ${error.message}`)
+  }
+}
+
+setInterval(deleteExpiredRefreshTokens, 60 * 60 * 100)

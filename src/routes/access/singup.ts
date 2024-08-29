@@ -5,7 +5,7 @@ import Logger from '../../core/Logger'
 import { validator } from '../../core/validator'
 import Access from './schema'
 import { SuccessResponse } from '../../core/responses'
-import { ErrorType, HandleError } from '../../core/errors'
+import { ErrorType } from '../../core/errors'
 
 const router = express.Router()
 

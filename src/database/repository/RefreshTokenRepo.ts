@@ -35,6 +35,7 @@ const RefreshTokenRepo = {
           user_id: userId
         }
       })
+
       return true
     } catch (error: any) {
       Logger.error(`Error deleting refresh token: ${error}`)

@@ -1,7 +1,7 @@
 import { createClient } from 'redis'
 import Logger from '../core/Logger'
 
-const redis = createClient()
+export const redis = createClient()
 
 export const connectRedis = async () => {
   try {
@@ -12,6 +12,8 @@ export const connectRedis = async () => {
   }
 }
 
+redis.on('connect', () => Logger.info('Connecting redis'))
+redis.on('reconnecting', () => Logger.info('Reconnecting redis'))
 redis.on('error', (error) => Logger.error(`Redis Client Error:  ${error}`))
 
 process.on('SIGINT', async () => {
