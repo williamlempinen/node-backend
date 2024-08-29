@@ -1,3 +1,3 @@
 import { User } from '@prisma/client'
 
-export type UserDTO = Omit<User, 'password' | 'role' | 'updated_at'>
+export type UserDTO = Omit<User, 'password' | 'updated_at'>

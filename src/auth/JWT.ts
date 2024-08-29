@@ -3,7 +3,7 @@ import { JWT_SECRET } from '../config'
 import { UserDTO } from '../database/models/UserDTOs'
 import Logger from '../core/Logger'
 
-export const createToken = (user: UserDTO, expiresIn: string = '1h'): string => {
+export const createJwtToken = (user: UserDTO, expiresIn: string = '1h'): string => {
   return jwt.sign(
     {
       id: user.id,
@@ -14,7 +14,7 @@ export const createToken = (user: UserDTO, expiresIn: string = '1h'): string => 
   )
 }
 
-export const verifyToken = (token: string): jwt.JwtPayload | string => {
+export const verifyJwtToken = (token: string): jwt.JwtPayload | string => {
   try {
     return jwt.verify(token, JWT_SECRET)
   } catch (error: any) {

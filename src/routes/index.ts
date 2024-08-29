@@ -5,6 +5,8 @@ import testPost from './test/indexPost'
 import testDatabase from './test/testDatabase'
 
 import signup from './access/singup'
+import login from './access/login'
+import UserRepo from '../database/repository/UserRepo'
 
 const rootRouter = express.Router()
 
@@ -18,12 +20,15 @@ rootRouter.use('/test', testPost)
 rootRouter.use('/test', testDatabase)
 // -----------------------------------------------
 
+// ------------------ ACCESS ---------------------
 rootRouter.get('/access', async (request: Request, response: Response) => {
   const req = request.params
+  const users = await UserRepo.findAll()
   Logger.debug(`Request params ${req}`)
-  response.send(`Hello world in ${request.params}`)
+  response.send(`Hello world in access, ${JSON.stringify(users)}`)
 })
 
 rootRouter.use('/access', signup)
-
+rootRouter.use('/access', login)
+// -----------------------------------------------
 export default rootRouter

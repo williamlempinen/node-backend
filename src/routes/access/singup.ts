@@ -16,6 +16,7 @@ router.post(
       Logger.error(`User already exists: ${exists}`)
       return
     }
+
     Logger.info('test')
     const results = await UserRepo.registerUser(request.body)
 
