@@ -16,7 +16,7 @@ router.post(
       Logger.error(`User already exists: ${exists}`)
       return
     }
-
+    Logger.info('test')
     const results = await UserRepo.registerUser(request.body)
 
     if (!results) {
@@ -25,6 +25,8 @@ router.post(
     }
 
     const { user, accessToken, refreshToken } = results
+
+    Logger.info(`Signup user: ${user}`)
 
     return response.status(201).json({
       user,

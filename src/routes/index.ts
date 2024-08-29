@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express'
+import Logger from '../core/Logger'
 import testGet from './test/indexGet'
 import testPost from './test/indexPost'
 import testDatabase from './test/testDatabase'
@@ -16,6 +17,12 @@ rootRouter.use('/test', testGet)
 rootRouter.use('/test', testPost)
 rootRouter.use('/test', testDatabase)
 // -----------------------------------------------
+
+rootRouter.get('/access', async (request: Request, response: Response) => {
+  const req = request.params
+  Logger.debug(`Request params ${req}`)
+  response.send(`Hello world in ${request.params}`)
+})
 
 rootRouter.use('/access', signup)
 
