@@ -4,7 +4,7 @@ import cors from 'cors'
 import rootRouter from './routes'
 import { connectToDatabase } from './database'
 import { connectRedis } from './cache'
-import ErrorMiddleware from './core/ErrorMiddleware'
+import errorMiddleware from './core/errorMiddleware'
 import { deleteExpiredRefreshTokens } from './core/accessUtils'
 
 const app = express()
@@ -21,6 +21,6 @@ app.use('/', rootRouter)
 
 deleteExpiredRefreshTokens()
 
-app.use(ErrorMiddleware)
+app.use(errorMiddleware)
 
 export default app

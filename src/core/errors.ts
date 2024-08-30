@@ -10,7 +10,7 @@ export enum ErrorType {
   BAD_REQUEST = 'BadRequestError'
 }
 
-export const HandleError = (errorType: ErrorType, message: string, response: Response) => {
+export const handleError = (errorType: ErrorType, message: string, response: Response) => {
   switch (errorType) {
     case ErrorType.BAD_TOKEN:
     case ErrorType.TOKEN_EXPIRED:
