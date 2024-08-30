@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
-import { createJwtToken } from '../auth/JWT'
+import { createJwtToken } from './JWT'
 import RefreshTokenRepo from '../database/repository/RefreshTokenRepo'
 import { UserDTO } from '../database/models/UserDTOs'
 import { prismaClient as prisma } from '../database'
-import Logger from './Logger'
+import Logger from '../core/Logger'
 
 type Tokens = {
   accessToken: string

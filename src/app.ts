@@ -5,7 +5,7 @@ import rootRouter from './routes'
 import { connectToDatabase } from './database'
 import { connectRedis } from './cache'
 import errorMiddleware from './core/errorMiddleware'
-import { deleteExpiredRefreshTokens } from './core/accessUtils'
+import { deleteExpiredRefreshTokens } from './auth/authUtils'
 
 const app = express()
 
@@ -19,7 +19,7 @@ connectRedis()
 
 app.use('/', rootRouter)
 
-deleteExpiredRefreshTokens()
+setInterval(deleteExpiredRefreshTokens, 60 * 60 * 100)
 
 app.use(errorMiddleware)
 

@@ -2,7 +2,7 @@ import { prismaClient as prisma } from '..'
 import { User, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { UserDTO } from '../models/UserDTOs'
-import { checkPasswordHash, createTokens, hashPassword } from '../../core/accessUtils'
+import { checkPasswordHash, createTokens, hashPassword } from '../../auth/authUtils'
 import Access from '../../routes/access/schema'
 import { z } from 'zod'
 
