@@ -2,9 +2,10 @@ import { prismaClient as prisma } from '..'
 import { User, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { UserDTO } from '../models/UserDTOs'
-import { checkPasswordHash, createTokens, hashPassword } from '../../auth/authUtils'
+import { checkPasswordHash, createTokens, hashPassword, generateSessionId } from '../../auth/authUtils'
 import { UserLogin } from '../../routes/access/schema'
 import { RepoResponse } from 'types'
+import { redis } from '../../cache'
 
 const UserRepo = {
   // USE ONLY IN THIS SCOPE
@@ -26,7 +27,6 @@ const UserRepo = {
       const userDTOs: UserDTO[] = allUsers.map((user) => UserRepo.userToDTO(user)).filter((userDTO) => userDTO !== null)
 
       return {
-        success: true,
         data: { ...userDTOs }
       }
     } catch (error: any) {
@@ -52,7 +52,7 @@ const UserRepo = {
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
 
-      return { success: true, data: { user: userDTO, accessToken, refreshToken } }
+      return { data: { user: userDTO, accessToken, refreshToken } }
     } catch (error: any) {
       Logger.error(`Error registering new user: ${error}`)
       return { errorMessage: 'Could not register user' }
@@ -64,7 +64,7 @@ const UserRepo = {
       const user = await UserRepo.findByEmail(data.email)
 
       if (!user) {
-        Logger.info(`No user found with email: ${data.email}`)
+        Logger.error(`No user found with email: ${data.email}`)
         return { errorMessage: `No user found with the email: ${data.email}` }
       }
 
@@ -79,7 +79,16 @@ const UserRepo = {
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
 
-      return { success: true, data: { user: userDTO, accessToken, refreshToken } }
+      let sessionId = await redis.get(`user:${userDTO.id}`)
+      // THIS SESSIONID LOGIC SHOULD BE IN CACHE REPO
+      if (!sessionId) {
+        sessionId = generateSessionId()
+      }
+
+      await redis.set(sessionId, JSON.stringify({ user: userDTO, accessToken }))
+      await redis.set(`user:${userDTO.id}`, sessionId)
+
+      return { data: { user: userDTO, accessToken, refreshToken } }
     } catch (error: any) {
       Logger.error(`Error login in user: ${error}`)
       return { errorMessage: `Internal server error ${error}` }

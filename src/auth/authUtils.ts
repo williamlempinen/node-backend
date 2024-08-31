@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import crypto from 'crypto'
+import crypto, { randomBytes } from 'crypto'
 import { createJwtToken } from './JWT'
 import RefreshTokenRepo from '../database/repository/RefreshTokenRepo'
 import { UserDTO } from '../database/models/UserDTOs'
@@ -57,4 +57,6 @@ export const deleteExpiredRefreshTokens = async () => {
   }
 }
 
-setInterval(deleteExpiredRefreshTokens, 60 * 60 * 100)
+export const generateSessionId = (): string => {
+  return randomBytes(16).toString('hex')
+}

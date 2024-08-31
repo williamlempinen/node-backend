@@ -1,5 +1,5 @@
 interface BaseSuccess<T> {
-  success: true
+  success?: true
   data: T
 }
 
