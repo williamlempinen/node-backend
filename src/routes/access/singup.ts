@@ -3,7 +3,7 @@ import { asyncHandler } from '../../core/asyncHandler'
 import UserRepo from '../../database/repository/UserRepo'
 import Logger from '../../core/Logger'
 import { validator } from '../../core/validator'
-import Access from './schema'
+import { Access } from './schema'
 import { SuccessResponse } from '../../core/responses'
 import { ErrorType } from '../../core/errors'
 
@@ -14,6 +14,7 @@ router.post(
   validator(Access.signup),
   asyncHandler(async (request, response, next) => {
     const exists = await UserRepo.findByEmail(request.body.email)
+
     if (exists) {
       Logger.error(`User already exists: ${exists}`)
       return next({ type: ErrorType.BAD_REQUEST, message: 'User already exists' })
@@ -21,15 +22,14 @@ router.post(
 
     const results = await UserRepo.registerUser(request.body)
 
-    if (!results) {
+    if ('errorMessage' in results) {
       Logger.error('User registration failed')
-      return next({ type: ErrorType.INTERNAL, message: 'User registration failed' })
+      return next({ type: ErrorType.INTERNAL, message: results.errorMessage })
     }
 
-    const { user, accessToken, refreshToken } = results
-    Logger.info(`Signup user: ${user.username}`)
+    Logger.info(`Signup user: ${results.data.user.username}`)
 
-    return SuccessResponse('Signup succeeded', response, { user, accessToken, refreshToken })
+    return SuccessResponse('Signup succeeded', response, results.data)
   })
 )
 

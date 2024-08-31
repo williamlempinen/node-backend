@@ -1,6 +1,6 @@
 import express from 'express'
 import { validator } from '../../core/validator'
-import Access from './schema'
+import { Access } from './schema'
 import { asyncHandler } from '../../core/asyncHandler'
 import UserRepo from '../../database/repository/UserRepo'
 import Logger from '../../core/Logger'
@@ -15,16 +15,14 @@ router.post(
   asyncHandler(async (request, response, next) => {
     const results = await UserRepo.login(request.body)
 
-    if (!results) {
+    if ('errorMessage' in results) {
       Logger.error('Error during login')
-      return next({ type: ErrorType.INTERNAL, message: 'User login failed' })
+      return next({ type: ErrorType.INTERNAL, message: results.errorMessage })
     }
 
-    const { user, accessToken, refreshToken } = results
+    Logger.info(`Login user: ${results.data}`)
 
-    Logger.info(`Login user: ${user}`)
-
-    return SuccessResponse('Login succeeded', response, { user, accessToken, refreshToken })
+    return SuccessResponse('Login succeeded', response, results.data)
   })
 )
 

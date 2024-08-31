@@ -3,10 +3,8 @@ import { User, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { UserDTO } from '../models/UserDTOs'
 import { checkPasswordHash, createTokens, hashPassword } from '../../auth/authUtils'
-import Access from '../../routes/access/schema'
-import { z } from 'zod'
-
-type UserLogin = z.infer<typeof Access.login>
+import { UserLogin } from '../../routes/access/schema'
+import { RepoResponse } from 'types'
 
 const UserRepo = {
   // USE ONLY IN THIS SCOPE
@@ -22,64 +20,69 @@ const UserRepo = {
     }
   },
 
-  async findAll(): Promise<UserDTO[] | null> {
+  async findAll(): Promise<RepoResponse<UserDTO[]>> {
     try {
       const allUsers: User[] = await prisma.user.findMany()
       const userDTOs: UserDTO[] = allUsers.map((user) => UserRepo.userToDTO(user)).filter((userDTO) => userDTO !== null)
 
-      return userDTOs
+      return {
+        success: true,
+        data: { ...userDTOs }
+      }
     } catch (error: any) {
       Logger.error(`Error occured while finding all users: ${error}`)
-      return null
+      return { errorMessage: 'Could not find all users' }
     }
   },
 
   async registerUser(
     data: P.UserCreateInput
-  ): Promise<{ user: UserDTO; accessToken: string; refreshToken: string } | null> {
+  ): Promise<RepoResponse<{ user: UserDTO; accessToken: string; refreshToken: string }>> {
     try {
       const exists = await UserRepo.findByEmail(data.email)
-      if (exists) return null
+      if (exists) return { errorMessage: 'User alredy exists' }
 
       const hashedPassword = hashPassword(data.password)
 
       const user = await prisma.user.create({ data: { ...data, password: hashedPassword } })
 
+      if (!user) return { errorMessage: 'Could not create user' }
+
       const userDTO = UserRepo.userToDTO(user)
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
 
-      return { user: userDTO, accessToken, refreshToken }
+      return { success: true, data: { user: userDTO, accessToken, refreshToken } }
     } catch (error: any) {
       Logger.error(`Error registering new user: ${error}`)
-      return null
+      return { errorMessage: 'Could not register user' }
     }
   },
 
-  async login(data: UserLogin): Promise<{ user: UserDTO; accessToken: string; refreshToken: string } | null> {
+  async login(data: UserLogin): Promise<RepoResponse<{ user: UserDTO; accessToken: string; refreshToken: string }>> {
     try {
       const user = await UserRepo.findByEmail(data.email)
 
       if (!user) {
         Logger.info(`No user found with email: ${data.email}`)
-        return null
+        return { errorMessage: `No user found with the email: ${data.email}` }
       }
 
       const isPasswordCorrect = checkPasswordHash(data.password, user.password)
 
       if (!isPasswordCorrect) {
         Logger.error('Password incorrect')
-        return null
+        return { errorMessage: 'Password incorrect' }
       }
 
       const userDTO = UserRepo.userToDTO(user)
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
 
-      return { user: userDTO, accessToken, refreshToken }
+      return { success: true, data: { user: userDTO, accessToken, refreshToken } }
     } catch (error: any) {
       Logger.error(`Error login in user: ${error}`)
-      return null
+      return { errorMessage: `Internal server error ${error}` }
     }
   },
 
