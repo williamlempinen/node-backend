@@ -2,10 +2,10 @@ import { prismaClient as prisma } from '..'
 import { User, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { UserDTO } from '../models/UserDTOs'
-import { checkPasswordHash, createTokens, hashPassword, generateSessionId } from '../../auth/authUtils'
+import { checkPasswordHash, createTokens, hashPassword } from '../../auth/authUtils'
 import { UserLogin } from '../../routes/access/schema'
 import { RepoResponse } from 'types'
-import { redis } from '../../cache'
+import { ErrorType } from '../../core/errors'
 
 const UserRepo = {
   // USE ONLY IN THIS SCOPE
@@ -26,12 +26,10 @@ const UserRepo = {
       const allUsers: User[] = await prisma.user.findMany()
       const userDTOs: UserDTO[] = allUsers.map((user) => UserRepo.userToDTO(user)).filter((userDTO) => userDTO !== null)
 
-      return {
-        data: { ...userDTOs }
-      }
+      return [{ ...userDTOs }, null]
     } catch (error: any) {
       Logger.error(`Error occured while finding all users: ${error}`)
-      return { errorMessage: 'Could not find all users' }
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   },
 
@@ -40,22 +38,23 @@ const UserRepo = {
   ): Promise<RepoResponse<{ user: UserDTO; accessToken: string; refreshToken: string }>> {
     try {
       const exists = await UserRepo.findByEmail(data.email)
-      if (exists) return { errorMessage: 'User alredy exists' }
+      if (exists)
+        return [null, { type: ErrorType.NOT_FOUND, errorMessage: `User with email: ${data.email} already exists` }]
 
       const hashedPassword = hashPassword(data.password)
 
       const user = await prisma.user.create({ data: { ...data, password: hashedPassword } })
 
-      if (!user) return { errorMessage: 'Could not create user' }
+      if (!user) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not create new user' }]
 
       const userDTO = UserRepo.userToDTO(user)
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
 
-      return { data: { user: userDTO, accessToken, refreshToken } }
+      return [{ user: userDTO, accessToken, refreshToken }, null]
     } catch (error: any) {
       Logger.error(`Error registering new user: ${error}`)
-      return { errorMessage: 'Could not register user' }
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   },
 
@@ -65,33 +64,24 @@ const UserRepo = {
 
       if (!user) {
         Logger.error(`No user found with email: ${data.email}`)
-        return { errorMessage: `No user found with the email: ${data.email}` }
+        return [null, { type: ErrorType.NOT_FOUND, errorMessage: `No user found with email ${data.email}` }]
       }
 
       const isPasswordCorrect = checkPasswordHash(data.password, user.password)
 
       if (!isPasswordCorrect) {
         Logger.error('Password incorrect')
-        return { errorMessage: 'Password incorrect' }
+        return [null, { type: ErrorType.UNAUTHORIZED, errorMessage: 'Password incorrect' }]
       }
 
       const userDTO = UserRepo.userToDTO(user)
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
 
-      let sessionId = await redis.get(`user:${userDTO.id}`)
-      // THIS SESSIONID LOGIC SHOULD BE IN CACHE REPO
-      if (!sessionId) {
-        sessionId = generateSessionId()
-      }
-
-      await redis.set(sessionId, JSON.stringify({ user: userDTO, accessToken }))
-      await redis.set(`user:${userDTO.id}`, sessionId)
-
-      return { data: { user: userDTO, accessToken, refreshToken } }
+      return [{ user: userDTO, accessToken, refreshToken }, null]
     } catch (error: any) {
       Logger.error(`Error login in user: ${error}`)
-      return { errorMessage: `Internal server error ${error}` }
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   },
 

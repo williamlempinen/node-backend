@@ -1,11 +1,9 @@
-interface BaseSuccess<T> {
-  success?: true
-  data: T
-}
+import { ErrorType } from '../core/errors'
 
-interface BaseError {
+interface RequestError {
+  type: ErrorType
   errorMessage: string
   errorDetails?: any
 }
 
-export type RepoResponse<T> = BaseSuccess<T> | BaseError
+export type RepoResponse<T> = Promise<[T | null, RequestError | null]>

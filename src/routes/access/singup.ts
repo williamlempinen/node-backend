@@ -20,16 +20,16 @@ router.post(
       return next({ type: ErrorType.BAD_REQUEST, message: 'User already exists' })
     }
 
-    const results = await UserRepo.registerUser(request.body)
+    const [user, error] = await UserRepo.registerUser(request.body)
 
-    if ('errorMessage' in results) {
+    if (error) {
       Logger.error('User registration failed')
-      return next({ type: ErrorType.INTERNAL, message: results.errorMessage })
+      return next({ type: error.type, message: error.errorMessage })
     }
 
-    Logger.info(`Signup user: ${results.data.user.username}`)
+    Logger.info(`Signup user: ${user?.user}`)
 
-    return SuccessResponse('Signup succeeded', response, results.data)
+    return SuccessResponse('Signup succeeded', response, user)
   })
 )
 
