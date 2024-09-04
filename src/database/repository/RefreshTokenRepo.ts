@@ -1,30 +1,35 @@
 import { prismaClient as prisma } from '..'
 import { RefreshToken, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
+import { RepoResponse } from 'types'
+import { ErrorType } from '../../core/errors'
 
 const RefreshTokenRepo = {
-  async create(data: P.RefreshTokenCreateInput): Promise<RefreshToken | null> {
+  async create(data: P.RefreshTokenCreateInput): Promise<RepoResponse<RefreshToken>> {
     try {
       const refreshToken = await prisma.refreshToken.create({ data })
-      return refreshToken
+      if (!refreshToken) {
+        return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+      }
+      return [refreshToken, null]
     } catch (error: any) {
       Logger.error(`Error creating refresh token: ${error}`)
-      return null
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   },
 
-  async findByUserId(userId: number): Promise<RefreshToken | null> {
+  async findByUserId(userId: number): Promise<RepoResponse<RefreshToken>> {
     try {
       const refreshToken = await prisma.refreshToken.findFirst({ where: { user_id: userId } })
 
       if (!refreshToken) {
-        return null
+        return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'No refresh tokens with this user id' }]
       }
 
-      return refreshToken
+      return [refreshToken, null]
     } catch (error: any) {
       Logger.error(`Error finding refresh token: ${error}`)
-      return null
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   },
 

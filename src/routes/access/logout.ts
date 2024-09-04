@@ -3,11 +3,14 @@ import { asyncHandler } from '../../core/asyncHandler'
 import { ErrorType } from '../../core/errors'
 import { SuccessResponse } from '../../core/responses'
 import RefreshTokenRepo from '../../database/repository/RefreshTokenRepo'
+import { validator } from '../../core/validator'
+import { Access } from './schema'
 
 const router = express.Router()
 
 router.post(
   '/logout',
+  validator(Access.logout),
   asyncHandler(async (request, response, next) => {
     const { userId } = request.body
 
