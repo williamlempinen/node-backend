@@ -4,7 +4,6 @@ import { Access } from './schema'
 import { asyncHandler } from '../../core/asyncHandler'
 import UserRepo from '../../database/repository/UserRepo'
 import Logger from '../../core/Logger'
-import { ErrorType } from '../../core/errors'
 import { SuccessResponse } from '../../core/responses'
 
 const router = express.Router()
