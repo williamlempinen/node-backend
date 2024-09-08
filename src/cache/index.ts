@@ -1,7 +1,9 @@
 import { createClient } from 'redis'
 import Logger from '../core/Logger'
 
-export const redis = createClient()
+export const redis = createClient({
+  url: process.env.REDIS_URL
+})
 
 export const connectRedis = async () => {
   try {
