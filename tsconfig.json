@@ -6,7 +6,7 @@
     "allowJs": false,
     "strictNullChecks": true,
     "noImplicitAny": true,
-    "strict": true,A
+    "strict": true,
     "skipLibCheck": true,
     "strictFunctionTypes": false,
     "noImplicitThis": false,
