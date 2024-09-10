@@ -12,6 +12,11 @@ export const Access = {
   }),
   logout: z.object({
     id: z.number()
+  }),
+  refreshToken: z.object({
+    email: z.string().email('Invalid email'),
+    id: z.number().min(1),
+    refreshToken: z.string().min(1, 'Refresh token is required')
   })
 }
 

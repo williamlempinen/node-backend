@@ -21,6 +21,19 @@ const UserRepo = {
     }
   },
 
+  async findById(id: number): Promise<RepoResponse<UserDTO>> {
+    try {
+      const user = await prisma.user.findUnique({ where: { id: id } })
+      if (!user) return [null, { type: ErrorType.NOT_FOUND, errorMessage: `No user found with id: ${id}` }]
+
+      const userDTO = UserRepo.userToDTO(user)
+      return [userDTO, null]
+    } catch (error: any) {
+      Logger.error(`Error finding user by id: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
+  },
+
   async findAll(): Promise<RepoResponse<UserDTO[]>> {
     try {
       const allUsers: User[] = await prisma.user.findMany()
@@ -44,12 +57,13 @@ const UserRepo = {
       const hashedPassword = hashPassword(data.password)
 
       const user = await prisma.user.create({ data: { ...data, password: hashedPassword } })
-
       if (!user) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not create new user' }]
 
       const userDTO = UserRepo.userToDTO(user)
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
+      if (!accessToken || !refreshToken)
+        return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not create tokens' }]
 
       return [{ user: userDTO, accessToken, refreshToken }, null]
     } catch (error: any) {
@@ -61,14 +75,12 @@ const UserRepo = {
   async login(data: UserLogin): Promise<RepoResponse<{ user: UserDTO; accessToken: string; refreshToken: string }>> {
     try {
       const user = await UserRepo.findByEmail(data.email)
-
       if (!user) {
         Logger.error(`No user found with email: ${data.email}`)
         return [null, { type: ErrorType.NOT_FOUND, errorMessage: `No user found with email ${data.email}` }]
       }
 
       const isPasswordCorrect = checkPasswordHash(data.password, user.password)
-
       if (!isPasswordCorrect) {
         Logger.error('Password incorrect')
         return [null, { type: ErrorType.UNAUTHORIZED, errorMessage: 'Password incorrect' }]
@@ -77,6 +89,8 @@ const UserRepo = {
       const userDTO = UserRepo.userToDTO(user)
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
+      if (!accessToken || !refreshToken)
+        return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not create tokens' }]
 
       return [{ user: userDTO, accessToken, refreshToken }, null]
     } catch (error: any) {

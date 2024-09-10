@@ -13,13 +13,6 @@ router.post(
   '/signup',
   validator(Access.signup),
   asyncHandler(async (request, response, next) => {
-    const exists = await UserRepo.findByEmail(request.body.email)
-
-    if (exists) {
-      Logger.error(`User already exists: ${exists}`)
-      return next({ type: ErrorType.BAD_REQUEST, message: 'User already exists' })
-    }
-
     const [user, error] = await UserRepo.registerUser(request.body)
 
     if (error) {

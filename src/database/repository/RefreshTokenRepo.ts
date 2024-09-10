@@ -8,9 +8,8 @@ const RefreshTokenRepo = {
   async create(data: P.RefreshTokenCreateInput): Promise<RepoResponse<RefreshToken>> {
     try {
       const refreshToken = await prisma.refreshToken.create({ data })
-      if (!refreshToken) {
-        return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
-      }
+      if (!refreshToken) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Error creating new refresh token' }]
+
       return [refreshToken, null]
     } catch (error: any) {
       Logger.error(`Error creating refresh token: ${error}`)
@@ -22,9 +21,8 @@ const RefreshTokenRepo = {
     try {
       const refreshToken = await prisma.refreshToken.findFirst({ where: { user_id: userId } })
 
-      if (!refreshToken) {
+      if (!refreshToken)
         return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'No refresh tokens with this user id' }]
-      }
 
       return [refreshToken, null]
     } catch (error: any) {

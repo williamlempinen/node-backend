@@ -27,6 +27,7 @@ export const createTokens = async (userDTO: UserDTO): Promise<Tokens> => {
   const refreshToken = crypto.randomBytes(64).toString('hex')
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h
 
+  // error handled in UserRepo
   await RefreshTokenRepo.create({
     user: { connect: { id: userDTO.id } },
     token_hash: refreshToken,
