@@ -21,28 +21,23 @@ services:
       - '${REDIS_PORT}:6379'
     volumes:
       - redis-data:/data
-    environment:
-      REDIS_HOST: ${REDIS_HOST}
 
   node-server:
     image: tuplawee7/node-server:latest
     container_name: node-server
     ports:
-      - '${PORT}:8080'
+      - 8000:8000
     volumes:
       - .:/usr/src/app
     depends_on:
       - redis
       - postgres
     environment:
-      NODE_ENV: production
-      DB_HOST: ${DB_HOST}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_DATABASE: ${DB_DATABASE}
-      DATABASE_URL: ${DATABASE_URL}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
+      DATABASE_URL: ${DATABASE_URL_POSTGRES}
+      REDIS_URL: ${REDIS_URL_REDIS}
       JWT_SECRET: ${JWT_SECRET}
     command: >
       sh -c "npx prisma migrate dev --name init &&
