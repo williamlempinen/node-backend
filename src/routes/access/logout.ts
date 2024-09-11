@@ -5,6 +5,7 @@ import { SuccessResponse } from '../../core/responses'
 import RefreshTokenRepo from '../../database/repository/RefreshTokenRepo'
 import { validator } from '../../core/validator'
 import { Access } from './schema'
+import Logger from '../../core/Logger'
 
 const router = express.Router()
 
@@ -12,17 +13,11 @@ router.post(
   '/logout',
   validator(Access.logout),
   asyncHandler(async (request, response, next) => {
-    const { userId } = request.body
+    const { id } = request.body
+    if (!id) return next({ type: ErrorType.BAD_REQUEST, message: 'User id is required' })
 
-    if (!userId) {
-      return next({ type: ErrorType.BAD_REQUEST, message: 'User id is required' })
-    }
-
-    const isRefreshTokenDeleted = await RefreshTokenRepo.deleteByUserId(userId)
-
-    if (!isRefreshTokenDeleted) {
-      return next({ type: ErrorType.INTERNAL, message: 'Error deleting refresh token' })
-    }
+    const isRefreshTokenDeleted = await RefreshTokenRepo.deleteByUserId(id)
+    if (!isRefreshTokenDeleted) return next({ type: ErrorType.INTERNAL, message: 'Error deleting refresh token' })
 
     response.clearCookie('accessToken')
     response.clearCookie('refreshToken')

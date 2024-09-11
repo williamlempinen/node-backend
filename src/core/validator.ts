@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { ZodSchema, ZodError } from 'zod'
-import { BadRequestResponse, InternalErrorResponse } from './responses'
+import { BadRequestResponse } from './responses'
+import Logger from './Logger'
 
 export enum ValidationSource {
   BODY = 'body',
@@ -10,15 +11,18 @@ export enum ValidationSource {
 
 export const validator = (schema: ZodSchema<any>, source: ValidationSource = ValidationSource.BODY) => {
   return (request: Request, response: Response, next: NextFunction) => {
+    Logger.warn(`Validator schema: ${schema}`)
     try {
       schema.parse(request[source])
+      Logger.warn('Validator gets it in try')
       next()
     } catch (error: any) {
       if (error instanceof ZodError) {
+        Logger.error('Invalid data provided in validator')
         return BadRequestResponse('Invalid data provided', response)
       }
-
-      return InternalErrorResponse('Internal server error', response)
+      Logger.error('Error in validator, not ZodError')
+      return next(error)
     }
   }
 }

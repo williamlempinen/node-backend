@@ -20,7 +20,6 @@ const RefreshTokenRepo = {
   async findByUserId(userId: number): Promise<RepoResponse<RefreshToken>> {
     try {
       const refreshToken = await prisma.refreshToken.findFirst({ where: { user_id: userId } })
-
       if (!refreshToken)
         return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'No refresh tokens with this user id' }]
 
