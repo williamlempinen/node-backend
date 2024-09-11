@@ -5,6 +5,7 @@ import RefreshTokenRepo from '../database/repository/RefreshTokenRepo'
 import { UserDTO } from '../database/models/UserDTOs'
 import { prismaClient as prisma } from '../database'
 import Logger from '../core/Logger'
+import { AuthFailureResponse } from '../core/responses'
 
 type Tokens = {
   accessToken: string
@@ -60,4 +61,10 @@ export const deleteExpiredRefreshTokens = async () => {
 
 export const generateSessionId = (): string => {
   return randomBytes(16).toString('hex')
+}
+
+export const getAccessToken = (authorization?: string): string => {
+  if (!authorization) return ''
+  if (!authorization.startsWith('Bearer ')) return ''
+  return authorization.split(' ')[1]
 }

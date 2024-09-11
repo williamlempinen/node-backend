@@ -3,7 +3,7 @@ import Logger from '../../core/Logger'
 import { asyncHandler } from '../../core/asyncHandler'
 import { validator } from '../../core/validator'
 import { Access } from './schema'
-import { SuccessResponse } from '../../core/responses'
+import { RefreshTokenResponse } from '../../core/responses'
 import UserRepo from '../../database/repository/UserRepo'
 import RefreshTokenRepo from '../../database/repository/RefreshTokenRepo'
 import { ErrorType } from '../../core/errors'
@@ -39,14 +39,14 @@ router.post(
 
     if (!user) return next({ type: ErrorType.NOT_FOUND, message: 'User not found' })
 
-    const tokens = await createTokens(user)
+    const { accessToken, refreshToken } = await createTokens(user)
     await RefreshTokenRepo.create({
       user: { connect: { id: user.id } },
-      token_hash: tokens.refreshToken,
+      token_hash: refreshToken,
       expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h
     })
 
-    return SuccessResponse('Tokens refreshed', response, tokens)
+    return RefreshTokenResponse('Tokens refreshed', response, accessToken, refreshToken)
   })
 )
 

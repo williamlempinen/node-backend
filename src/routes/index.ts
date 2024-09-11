@@ -9,6 +9,8 @@ import login from './access/login'
 import logout from './access/logout'
 import UserRepo from '../database/repository/UserRepo'
 
+import authenticate from '../auth/authenticate'
+
 const rootRouter = express.Router()
 
 rootRouter.get('/', async (request: Request, response: Response) => {
@@ -33,5 +35,7 @@ rootRouter.use('/access', signup)
 rootRouter.use('/access', login)
 rootRouter.use('/access', logout)
 // -----------------------------------------------
+
+//rootRouter.use(authenticate)
 
 export default rootRouter

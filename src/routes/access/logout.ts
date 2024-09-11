@@ -5,7 +5,6 @@ import { SuccessResponse } from '../../core/responses'
 import RefreshTokenRepo from '../../database/repository/RefreshTokenRepo'
 import { validator } from '../../core/validator'
 import { Access } from './schema'
-import Logger from '../../core/Logger'
 
 const router = express.Router()
 

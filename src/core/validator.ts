@@ -6,12 +6,13 @@ import Logger from './Logger'
 export enum ValidationSource {
   BODY = 'body',
   QUERY = 'query',
-  PARAMS = 'params'
+  PARAMS = 'params',
+  HEADERS = 'headers'
 }
 
 export const validator = (schema: ZodSchema<any>, source: ValidationSource = ValidationSource.BODY) => {
   return (request: Request, response: Response, next: NextFunction) => {
-    Logger.warn(`Validator schema: ${schema}`)
+    Logger.warn(`Validator schema: ${JSON.stringify(schema)}`)
     try {
       schema.parse(request[source])
       Logger.warn('Validator gets it in try')
