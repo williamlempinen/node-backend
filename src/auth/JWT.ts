@@ -1,7 +1,13 @@
-import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import { JWT_SECRET } from '../config'
 import { UserDTO } from '../database/models/UserDTOs'
 import Logger from '../core/Logger'
+
+type DecodedToken = {
+  id: number
+  email: string
+  role: string
+} & JwtPayload
 
 export const createJwtToken = (user: UserDTO, expiresIn: string = '1h'): string => {
   return jwt.sign(
@@ -15,11 +21,12 @@ export const createJwtToken = (user: UserDTO, expiresIn: string = '1h'): string 
   )
 }
 
-export const verifyJwtToken = (token: string): jwt.JwtPayload | null | string => {
+export const verifyJwtToken = (token: string): DecodedToken | null => {
   try {
     Logger.warn(`Verifying token: ${token}`)
     Logger.warn(`Result: ${JSON.stringify(jwt.verify(token, JWT_SECRET))}`)
-    return jwt.verify(token, JWT_SECRET)
+    const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken
+    return decoded
   } catch (error: any) {
     Logger.error(`Error verifing token: ${error}`)
     return null

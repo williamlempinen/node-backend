@@ -19,11 +19,12 @@ router.use(
     if (!accessToken || accessToken.length === 0)
       return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })
 
-    const result = verifyJwtToken(accessToken)
-    Logger.warn(`Returned from the verifyToken: ${result}`)
+    const decodedToken = verifyJwtToken(accessToken)
+    Logger.warn(`Returned from the verifyToken: ${JSON.stringify(decodedToken)}`)
+    if (!decodedToken || !decodedToken.id) return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Invalid token' })
 
-    //const [user, error] = await UserRepo.findById(id)
-    //if (error) return next({ type: error.type, errorMessage: error.errorMessage })
+    const [user, error] = await UserRepo.findById(decodedToken.id)
+    if (error) return next({ type: error.type, errorMessage: error.errorMessage })
 
     return next()
   })
