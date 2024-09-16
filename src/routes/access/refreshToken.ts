@@ -18,6 +18,9 @@ router.post(
     const [storedToken, error] = await RefreshTokenRepo.findByUserId(request.body.id)
     if (error) return next({ type: error.type, message: error.errorMessage })
 
+    Logger.info(`Found token in DB: ${storedToken?.token_hash}`)
+    Logger.info(`Token from client: ${request.body.refreshToken}`)
+
     if (storedToken?.token_hash !== request.body.refreshToken)
       return next({ type: ErrorType.BAD_REQUEST, message: 'Invalid refresh token' })
 
@@ -45,6 +48,8 @@ router.post(
       token_hash: refreshToken,
       expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h
     })
+
+    Logger.info(`Tokens refreshed for user: ${user.email}`)
 
     return RefreshTokenResponse('Tokens refreshed', response, accessToken, refreshToken)
   })

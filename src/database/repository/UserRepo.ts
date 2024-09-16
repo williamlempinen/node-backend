@@ -6,6 +6,7 @@ import { checkPasswordHash, createTokens, hashPassword } from '../../auth/authUt
 import { UserLogin } from '../../routes/access/schema'
 import { RepoResponse } from 'types'
 import { ErrorType } from '../../core/errors'
+import RefreshTokenRepo from './RefreshTokenRepo'
 
 const UserRepo = {
   // USE ONLY IN THIS SCOPE
@@ -87,6 +88,14 @@ const UserRepo = {
       }
 
       const userDTO = UserRepo.userToDTO(user)
+
+      const [existingRefreshToken, error] = await RefreshTokenRepo.findByUserId(userDTO.id)
+      if (error) return [null, { type: error.type, errorMessage: error.errorMessage }]
+
+      if (existingRefreshToken) {
+        Logger.info(`Found existing refresh token: ${existingRefreshToken.token_hash}`)
+        await RefreshTokenRepo.deleteByUserId(userDTO.id)
+      }
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
       if (!accessToken || !refreshToken)
