@@ -5,6 +5,7 @@ import { asyncHandler } from '../../core/asyncHandler'
 import UserRepo from '../../database/repository/UserRepo'
 import Logger from '../../core/Logger'
 import { SuccessResponse } from '../../core/responses'
+import { verifyJwtToken } from '../../auth/JWT'
 
 const router = express.Router()
 
@@ -19,7 +20,13 @@ router.post(
       return next({ type: error.type, message: error.errorMessage })
     }
 
-    Logger.info(`Login user: ${user}`)
+    Logger.info(`Login user: ${JSON.stringify(user)}`)
+
+    if (user !== null && user.accessToken !== null) {
+      verifyJwtToken(user?.accessToken)
+    }
+    //Logger.info(`Response: ${JSON.stringify(response)}`)
+    //Logger.info(`Verify jwt token: ${verifyJwtToken(response.accessToken)}`)
 
     return SuccessResponse('Login succeeded', response, user)
   })

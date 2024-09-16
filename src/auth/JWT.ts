@@ -18,7 +18,7 @@ export const createJwtToken = (user: UserDTO, expiresIn: string = '1h'): string 
 export const verifyJwtToken = (token: string): jwt.JwtPayload | null | string => {
   try {
     Logger.warn(`Verifying token: ${token}`)
-    Logger.warn(`Result: ${jwt.verify(token, JWT_SECRET)}`)
+    Logger.warn(`Result: ${JSON.stringify(jwt.verify(token, JWT_SECRET))}`)
     return jwt.verify(token, JWT_SECRET)
   } catch (error: any) {
     Logger.error(`Error verifing token: ${error}`)

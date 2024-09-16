@@ -38,6 +38,9 @@ rootRouter.use('/access', logout)
 rootRouter.use('/access', refreshToken)
 // -----------------------------------------------
 
-//rootRouter.use(authenticate)
+rootRouter.use('/protected', authenticate)
+rootRouter.get('/protected', async (request: Request, response: Response) => {
+  response.send(`You are authorized to see this message, ${request.body}`)
+})
 
 export default rootRouter

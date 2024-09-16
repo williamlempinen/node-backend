@@ -89,8 +89,8 @@ const UserRepo = {
 
       const userDTO = UserRepo.userToDTO(user)
 
+      // DONT'T HANDLE THE ERROR
       const [existingRefreshToken, error] = await RefreshTokenRepo.findByUserId(userDTO.id)
-      if (error) return [null, { type: error.type, errorMessage: error.errorMessage }]
 
       if (existingRefreshToken) {
         Logger.info(`Found existing refresh token: ${existingRefreshToken.token_hash}`)

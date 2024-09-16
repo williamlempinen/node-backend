@@ -13,7 +13,9 @@ const router = express.Router()
 router.use(
   validator(Auth.req, ValidationSource.HEADERS),
   asyncHandler(async (request, response, next) => {
+    Logger.info('In auth middleware')
     const accessToken = getAccessToken(request.headers.authorization)
+    Logger.warn(`Access token: ${accessToken}`)
     if (!accessToken || accessToken.length === 0)
       return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })
 
