@@ -35,10 +35,11 @@ rootRouter.get('/access', async (request: Request, response: Response) => {
 rootRouter.use('/access', signup)
 rootRouter.use('/access', login)
 rootRouter.use('/access', logout)
-rootRouter.use('/access', refreshToken)
 // -----------------------------------------------
 
 rootRouter.use('/protected', authenticate)
+// the above is the authmiddleware, so connection should happen here
+rootRouter.use('/access', refreshToken)
 rootRouter.get('/protected', async (request: Request, response: Response) => {
   response.send(`You are authorized to see this message, ${JSON.stringify(request.body)}`)
 })
