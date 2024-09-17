@@ -24,7 +24,7 @@ router.use(
     if (!decodedToken || !decodedToken.id) return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Invalid token' })
 
     const [user, error] = await UserRepo.findById(decodedToken.id)
-    if (error) return next({ type: error.type, errorMessage: error.errorMessage })
+    if (error) return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Invalid token' })
 
     return next()
   })
