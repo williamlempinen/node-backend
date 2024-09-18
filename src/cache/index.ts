@@ -14,7 +14,7 @@ export const connectRedis = async () => {
   }
 }
 
-redis.on('connect', () => Logger.info('Connecting redis'))
+redis.on('connect', () => Logger.warn('Connecting redis'))
 redis.on('reconnecting', () => Logger.info('Reconnecting redis'))
 redis.on('error', (error) => Logger.error(`Redis Client Error:  ${error}`))
 

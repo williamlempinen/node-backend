@@ -26,9 +26,7 @@ rootRouter.use('/test', testDatabase)
 
 // ------------------ ACCESS ---------------------
 rootRouter.get('/access', async (request: Request, response: Response) => {
-  const req = request.params
   const users = await UserRepo.findAll()
-  Logger.debug(`Request params ${req}`)
   response.send(`Hello world in access, ${JSON.stringify(users)}`)
 })
 
@@ -38,7 +36,6 @@ rootRouter.use('/access', logout)
 // -----------------------------------------------
 
 rootRouter.use('/protected', authenticate)
-// the above is the authmiddleware, so connection should happen here
 rootRouter.use('/access', refreshToken)
 rootRouter.get('/protected', async (request: Request, response: Response) => {
   response.send(`You are authorized to see this message, ${JSON.stringify(request.body)}`)

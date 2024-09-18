@@ -7,16 +7,9 @@ import { verifyJwtToken } from './auth/JWT'
 
 const server = createServer(app)
 
-wss.on('connection', (ws) => {
-  Logger.info('WebSocket connection established')
-
-  ws.on('message', (message) => {
-    Logger.info(`Received WebSocket message: ${message}`)
-    ws.send(`Echo: ${message}`)
-  })
-})
-
 server.on('upgrade', (request, socket, head) => {
+  Logger.warn(`Server got upgrade event with: socket:${JSON.stringify(socket)}, head:${JSON.stringify(head)}`)
+
   const token = new URLSearchParams(request?.url?.split('?')[1]).get('token')
 
   if (token && verifyJwtToken(token)) {
