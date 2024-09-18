@@ -2,8 +2,7 @@ import app from './app'
 import { port } from './config'
 import Logger from './core/Logger'
 import { createServer } from 'http'
-import wss, { handleWebSocketUpgrade } from './websocket'
-import { verifyJwtToken } from './auth/JWT'
+import { handleWebSocketUpgrade } from './websocket'
 
 const server = createServer(app)
 
