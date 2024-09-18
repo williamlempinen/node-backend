@@ -17,7 +17,7 @@ wss.on('connection', (ws, request) => {
   })
 })
 
-export const upgradeConnectionToSockets = (request: any, socket: any, head: any) => {
+export const handleWebSocketUpgrade = (request: any, socket: any, head: any) => {
   const token = new URLSearchParams(request.url.split('?')[1]).get('token')
   Logger.warn(`Upgrade, token: ${token}`)
 
