@@ -11,6 +11,7 @@ import UserRepo from '../database/repository/UserRepo'
 
 import authenticate from '../auth/authenticate'
 import refreshToken from './access/refreshToken'
+import activeUsers from './users/activeUsers'
 
 const rootRouter = express.Router()
 
@@ -40,5 +41,7 @@ rootRouter.use('/access', refreshToken)
 rootRouter.get('/protected', async (request: Request, response: Response) => {
   response.send(`You are authorized to see this message, ${JSON.stringify(request.body)}`)
 })
+
+rootRouter.use('/users', activeUsers)
 
 export default rootRouter

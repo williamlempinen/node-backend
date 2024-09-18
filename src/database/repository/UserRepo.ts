@@ -101,9 +101,45 @@ const UserRepo = {
       if (!accessToken || !refreshToken)
         return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not create tokens' }]
 
+      const setStatus = await UserRepo.updateUserIsActive(userDTO.id, true)
+      if (!setStatus) {
+        Logger.error('Error updating user status')
+        return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not update user status' }]
+      }
+
       return [{ user: userDTO, accessToken, refreshToken }, null]
     } catch (error: any) {
       Logger.error(`Error login in user: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
+  },
+
+  async updateUserIsActive(userId: number, isActive: boolean): Promise<boolean | null> {
+    try {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { is_active: isActive }
+      })
+
+      Logger.info('User active status updated')
+      return true
+    } catch (error: any) {
+      Logger.error(`Error updating user active status, user id: ${userId}`)
+      return null
+    }
+  },
+
+  async findAllActiveUsers(): Promise<RepoResponse<UserDTO[]>> {
+    try {
+      const activeUsers = await prisma.user.findMany({ where: { is_active: true } })
+      if (!activeUsers) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+      const userDTOs: UserDTO[] = activeUsers
+        .map((user) => UserRepo.userToDTO(user))
+        .filter((userDTO) => userDTO !== null)
+
+      return [userDTOs, null]
+    } catch (error: any) {
+      Logger.error(`Error finding active users: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   },
