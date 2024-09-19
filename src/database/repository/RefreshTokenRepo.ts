@@ -5,12 +5,25 @@ import { RepoResponse } from 'types'
 import { ErrorType } from '../../core/errors'
 
 const RefreshTokenRepo = {
-  async create(data: P.RefreshTokenCreateInput): Promise<RepoResponse<RefreshToken>> {
+  async create(userId: number, refreshToken: string): Promise<RepoResponse<RefreshToken>> {
     try {
-      const refreshToken = await prisma.refreshToken.create({ data })
-      if (!refreshToken) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Error creating new refresh token' }]
+      const existingToken = await prisma.refreshToken.findFirst({
+        where: {
+          user_id: userId
+        }
+      })
+      if (existingToken) await RefreshTokenRepo.deleteByUserId(userId)
 
-      return [refreshToken, null]
+      const token = await prisma.refreshToken.create({
+        data: {
+          user: { connect: { id: userId } },
+          token_hash: refreshToken,
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        }
+      })
+      if (!token) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Error creating new refresh token' }]
+
+      return [token, null]
     } catch (error: any) {
       Logger.error(`Error creating refresh token: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]

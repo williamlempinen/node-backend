@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
@@ -9,34 +9,75 @@ datasource db {
 }
 
 model User {
-  id                 Int       @id @default(autoincrement())
-  username           String    @unique @db.VarChar(54)
-  email              String    @unique @db.VarChar(100)
-  password           String    @db.Text
-  is_active          Boolean   @default(true)
-  created_at         DateTime  @default(now()) @db.Timestamp(6)
-  role               String    @default("REGULAR") @db.VarChar(20)
+  id                  Int      @id @default(autoincrement())
+  username            String   @unique @db.VarChar(54)
+  email               String   @unique @db.VarChar(100)
+  password            String   @db.Text
+  is_active           Boolean  @default(true)
+  created_at          DateTime @default(now()) @db.Timestamp(6)
+  role                String   @default("REGULAR") @db.VarChar(20)
   profile_picture_url String?  @db.Text
-  updated_at         DateTime  @updatedAt @db.Timestamp(6)
+  updated_at          DateTime @updatedAt @db.Timestamp(6)
 
-  refreshTokens      RefreshToken[] @relation("UserRefreshTokens")
+  refreshToken  RefreshToken?  @relation("UserRefreshToken")
+  messages      Message[]      @relation("UserSentMessages")
+  conversations Conversation[] @relation("UserConversations")
+  contacts      Contact[]      @relation("UserContacts")
+  asContacts    Contact[]      @relation("AsContacts")
 
   @@index([email], map: "index_users_email")
   @@index([username], map: "index_users_username")
-
   @@map("users")
 }
 
 model RefreshToken {
   id         Int      @id @default(autoincrement())
-  user_id    Int
+  user_id    Int      @unique
   token_hash String   @db.Text
   expires_at DateTime @db.Timestamp(6)
   created_at DateTime @default(now()) @db.Timestamp(6)
 
-  user       User     @relation("UserRefreshTokens", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user User @relation("UserRefreshToken", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([user_id], map: "idx_refresh_tokens_user_id")
-
   @@map("refresh_tokens")
+}
+
+model Message {
+  id              Int      @id @default(autoincrement())
+  content         String   @db.VarChar(300)
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+  sender_id       Int
+  is_seen         Boolean  @default(false)
+  conversation_id Int
+
+  conversation Conversation @relation("ConversationMessages", fields: [conversation_id], references: [id], onDelete: Cascade)
+  senderUser   User         @relation("UserSentMessages", fields: [sender_id], references: [id])
+
+  @@map("messages")
+}
+
+model Conversation {
+  id         Int      @id @default(autoincrement())
+  is_group   Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @updatedAt @db.Timestamp(6)
+
+  messages     Message[] @relation("ConversationMessages")
+  participants User[]    @relation("UserConversations")
+
+  @@map("conversations")
+}
+
+model Contact {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  contact_id Int
+  created_at DateTime @default(now()) @db.Timestamp(6)
+
+  user    User @relation("UserContacts", fields: [user_id], references: [id])
+  contact User @relation("AsContacts", fields: [contact_id], references: [id])
+
+  @@unique([user_id, contact_id], map: "unique_contacts")
+  @@map("contacts")
 }

@@ -46,11 +46,8 @@ router.post(
     if (!user) return next({ type: ErrorType.NOT_FOUND, message: 'User not found' })
 
     const { accessToken, refreshToken } = await createTokens(user)
-    await RefreshTokenRepo.create({
-      user: { connect: { id: user.id } },
-      token_hash: refreshToken,
-      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h
-    })
+
+    await RefreshTokenRepo.create(user.id, refreshToken)
 
     Logger.info(`Tokens refreshed for user: ${user.email}`)
 
