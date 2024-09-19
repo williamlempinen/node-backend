@@ -3,14 +3,17 @@ import testGet from './test/indexGet'
 import testPost from './test/indexPost'
 import testDatabase from './test/testDatabase'
 
+import UserRepo from '../database/repository/UserRepo'
+
 import signup from './access/singup'
 import login from './access/login'
 import logout from './access/logout'
-import UserRepo from '../database/repository/UserRepo'
+import refreshToken from './access/refreshToken'
 
 import authenticate from '../auth/authenticate'
-import refreshToken from './access/refreshToken'
+
 import activeUsers from './users/activeUsers'
+import searchUsers from './users/searchUsers'
 
 const rootRouter = express.Router()
 
@@ -38,6 +41,7 @@ rootRouter.use('/access', refreshToken)
 
 // ------------------ USERS ----------------------
 rootRouter.use('/users', activeUsers)
+rootRouter.use('/users', searchUsers)
 // -----------------------------------------------
 
 rootRouter.get('/protected', authenticate, async (request: Request, response: Response) => {
