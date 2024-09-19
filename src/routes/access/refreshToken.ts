@@ -8,8 +8,11 @@ import UserRepo from '../../database/repository/UserRepo'
 import RefreshTokenRepo from '../../database/repository/RefreshTokenRepo'
 import { ErrorType } from '../../core/errors'
 import { createTokens } from '../../auth/authUtils'
+import authenticate from '../../auth/authenticate'
 
 const router = express.Router()
+
+router.use('/', authenticate)
 
 router.post(
   '/refreshtoken',

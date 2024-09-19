@@ -3,8 +3,11 @@ import { asyncHandler } from '../../core/asyncHandler'
 import UserRepo from '../../database/repository/UserRepo'
 import { SuccessResponse } from '../../core/responses'
 import Logger from '../../core/Logger'
+import authenticate from '../../auth/authenticate'
 
 const router = express.Router()
+
+router.use('/', authenticate)
 
 router.get(
   '/active-users',

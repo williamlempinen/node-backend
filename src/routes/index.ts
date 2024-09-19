@@ -28,20 +28,20 @@ rootRouter.use('/test', testDatabase)
 // ------------------ ACCESS ---------------------
 rootRouter.get('/access', async (request: Request, response: Response) => {
   const users = await UserRepo.findAll()
-  response.send(`Hello world in access, ${JSON.stringify(users)}`)
+  response.send(`All created users: ${JSON.stringify(users)}`)
 })
 
 rootRouter.use('/access', signup)
 rootRouter.use('/access', login)
 rootRouter.use('/access', logout)
+rootRouter.use('/access', refreshToken)
 // -----------------------------------------------
 
-rootRouter.use('/protected', authenticate)
-rootRouter.use('/access', refreshToken)
-rootRouter.get('/protected', async (request: Request, response: Response) => {
+// ------------------ USERS ----------------------
+rootRouter.use('/users', activeUsers)
+// -----------------------------------------------
+rootRouter.get('/protected', authenticate, async (request: Request, response: Response) => {
   response.send(`You are authorized to see this message, ${JSON.stringify(request.body)}`)
 })
-
-rootRouter.use('/users', activeUsers)
 
 export default rootRouter
