@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express'
-import Logger from '../core/Logger'
 import testGet from './test/indexGet'
 import testPost from './test/indexPost'
 import testDatabase from './test/testDatabase'
@@ -40,6 +39,7 @@ rootRouter.use('/access', refreshToken)
 // ------------------ USERS ----------------------
 rootRouter.use('/users', activeUsers)
 // -----------------------------------------------
+
 rootRouter.get('/protected', authenticate, async (request: Request, response: Response) => {
   response.send(`You are authorized to see this message, ${JSON.stringify(request.body)}`)
 })

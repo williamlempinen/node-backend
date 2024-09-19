@@ -4,7 +4,7 @@ import Logger from '../../core/Logger'
 import { UserDTO } from '../models/UserDTOs'
 import { checkPasswordHash, createTokens, hashPassword } from '../../auth/authUtils'
 import { UserLogin } from '../../routes/access/schema'
-import { RepoResponse } from 'types'
+import { Paginated, PaginatedSearchQuery, RepoResponse } from 'types'
 import { ErrorType } from '../../core/errors'
 import RefreshTokenRepo from './RefreshTokenRepo'
 
@@ -140,6 +140,38 @@ const UserRepo = {
       return [userDTOs, null]
     } catch (error: any) {
       Logger.error(`Error finding active users: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
+  },
+
+  async searchUsers({
+    searchQuery,
+    page = 1,
+    limit = 10
+  }: PaginatedSearchQuery): Promise<RepoResponse<Paginated<UserDTO>>> {
+    try {
+      const skip = (page - 1) * limit
+      const whereClause: P.UserWhereInput = {
+        username: { contains: searchQuery, mode: 'insensitive' }
+      }
+
+      const totalCount = await prisma.user.count({ where: whereClause })
+      const users = await prisma.user.findMany({
+        where: whereClause,
+        skip: skip,
+        take: limit
+      })
+
+      if (!users || !totalCount) {
+        Logger.error('Error finding users')
+        return [null, { type: ErrorType.INTERNAL, errorMessage: 'Error finding users' }]
+      }
+
+      const userDTOs: UserDTO[] = users.map((user) => UserRepo.userToDTO(user)).filter((userDTO) => userDTO !== null)
+
+      return [{ data: userDTOs, totalCount, page, limit }, null]
+    } catch (error: any) {
+      Logger.error(`Error searching users: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   },
