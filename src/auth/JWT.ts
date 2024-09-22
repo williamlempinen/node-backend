@@ -1,6 +1,6 @@
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { JWT_SECRET } from '../config'
-import { UserDTO } from '../database/models/UserDTOs'
+import { UserDTO } from '../database/models/UserDTO'
 import Logger from '../core/Logger'
 
 type DecodedToken = {

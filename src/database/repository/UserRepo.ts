@@ -1,7 +1,7 @@
 import { prismaClient as prisma } from '..'
 import { User, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
-import { UserDTO } from '../models/UserDTOs'
+import { UserDTO } from '../models/UserDTO'
 import { checkPasswordHash, createTokens, hashPassword } from '../../auth/authUtils'
 import { UserLogin } from '../../routes/access/schema'
 import { Paginated, PaginatedSearchQuery, RepoResponse } from 'types'

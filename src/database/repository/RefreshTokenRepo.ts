@@ -12,7 +12,15 @@ const RefreshTokenRepo = {
           user_id: userId
         }
       })
-      if (existingToken) await RefreshTokenRepo.deleteByUserId(userId)
+
+      if (existingToken) {
+        const [isDeleted, error] = await RefreshTokenRepo.deleteByUserId(userId)
+        if (error) {
+          Logger.error('Error deleting existing user refreshtoken')
+          return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+        }
+        Logger.info('Old existing refreshtoken deleted')
+      }
 
       const token = await prisma.refreshToken.create({
         data: {
@@ -43,7 +51,7 @@ const RefreshTokenRepo = {
     }
   },
 
-  async deleteByUserId(userId: number): Promise<boolean> {
+  async deleteByUserId(userId: number): Promise<RepoResponse<boolean>> {
     try {
       await prisma.refreshToken.deleteMany({
         where: {
@@ -51,10 +59,10 @@ const RefreshTokenRepo = {
         }
       })
 
-      return true
+      return [true, null]
     } catch (error: any) {
       Logger.error(`Error deleting refresh token: ${error}`)
-      return false
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'internal server error' }]
     }
   }
 }

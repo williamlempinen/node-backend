@@ -2,10 +2,9 @@ import bcrypt from 'bcrypt'
 import crypto, { randomBytes } from 'crypto'
 import { createJwtToken } from './JWT'
 import RefreshTokenRepo from '../database/repository/RefreshTokenRepo'
-import { UserDTO } from '../database/models/UserDTOs'
+import { UserDTO } from '../database/models/UserDTO'
 import { prismaClient as prisma } from '../database'
 import Logger from '../core/Logger'
-import { AuthFailureResponse } from '../core/responses'
 
 type Tokens = {
   accessToken: string
@@ -54,6 +53,7 @@ export const deleteExpiredRefreshTokens = async () => {
   }
 }
 
+// TODO: implement sessions for client
 export const generateSessionId = (): string => {
   return randomBytes(16).toString('hex')
 }

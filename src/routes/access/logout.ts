@@ -16,12 +16,13 @@ router.post(
     const { id } = request.body
     if (!id) return next({ type: ErrorType.BAD_REQUEST, message: 'User id is required' })
 
-    const isRefreshTokenDeleted = await RefreshTokenRepo.deleteByUserId(id)
-    if (!isRefreshTokenDeleted) return next({ type: ErrorType.INTERNAL, message: 'Error deleting refresh token' })
+    const [isRefreshTokenDeleted, error] = await RefreshTokenRepo.deleteByUserId(id)
+    if (error) return next({ type: error.type, message: error.errorMessage })
 
     const setStatus = await UserRepo.updateUserIsActive(id, false)
     if (!setStatus) return next({ type: ErrorType.INTERNAL, message: 'Error deleting refresh token' })
 
+    // TODO not hadled
     response.clearCookie('accessToken')
     response.clearCookie('refreshToken')
 
