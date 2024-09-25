@@ -21,8 +21,6 @@ router.post(
 
     Logger.info(`Login user: ${JSON.stringify(data)}`)
 
-    if (!data) return
-
     return SuccessResponse('Login succeeded', response, data)
   })
 )

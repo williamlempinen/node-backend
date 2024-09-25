@@ -6,6 +6,8 @@ import Logger from '../core/Logger'
 import { ErrorType } from '../core/errors'
 import { redisGet } from '../cache/repository'
 import { SuccessResponse } from '../core/responses'
+import UserRepo from '../database/repository/UserRepo'
+import { verifyJwtToken } from './JWT'
 
 const router = express.Router()
 
@@ -22,11 +24,16 @@ router.post(
 
     Logger.warn('SESSION: ', sessionId)
     const isValidSession = await redisGet(sessionId)
-    if (!isValidSession || !JSON.parse(isValidSession).accessToken || !JSON.parse(isValidSession).refreshToken) {
+    if (!isValidSession || !JSON.parse(isValidSession).accessToken || !JSON.parse(isValidSession).refreshToken)
       return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })
-    }
 
-    return SuccessResponse('Authenticated', response)
+    const decodedToken = verifyJwtToken(JSON.parse(isValidSession).accessToken)
+    if (!decodedToken || !decodedToken.id) return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })
+
+    const [user, error] = await UserRepo.findById(decodedToken.id)
+    if (error) return next({ type: error.type, errorMessage: error.errorMessage })
+
+    return SuccessResponse('Authenticated', response, user)
   })
 )
 

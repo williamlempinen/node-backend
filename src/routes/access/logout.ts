@@ -19,10 +19,10 @@ router.post(
     const { sessionId } = request.body
     if (!sessionId) return next({ type: ErrorType.BAD_REQUEST, message: 'Session id is required' })
 
-    const cachedToken = await redisGet(sessionId)
-    if (!cachedToken) return next({ type: ErrorType.INTERNAL, message: 'Token not found from sessions' })
+    const cachedData = await redisGet(sessionId)
+    if (!cachedData) return next({ type: ErrorType.INTERNAL, message: 'Token not found from sessions' })
 
-    const decodedToken = verifyJwtToken(JSON.parse(cachedToken).accessToken)
+    const decodedToken = verifyJwtToken(JSON.parse(cachedData).accessToken)
     if (!decodedToken || !decodedToken.id)
       return next({ type: ErrorType.INTERNAL, message: 'Token not found from sessions' })
 
@@ -33,11 +33,6 @@ router.post(
 
     const setStatus = await UserRepo.updateUserIsActive(decodedToken.id, false)
     if (!setStatus) return next({ type: ErrorType.INTERNAL, message: 'Error deleting refresh token' })
-
-    // TODO not hadled
-    response.clearCookie('accessToken')
-    response.clearCookie('refreshToken')
-    response.clearCookie('sessionId')
 
     redisDelete(sessionId)
 
