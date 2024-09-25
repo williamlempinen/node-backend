@@ -14,6 +14,7 @@ import authenticate from '../auth/authenticate'
 
 import activeUsers from './users/activeUsers'
 import searchUsers from './users/searchUsers'
+import { redisGet } from '../cache/repository'
 
 const rootRouter = express.Router()
 

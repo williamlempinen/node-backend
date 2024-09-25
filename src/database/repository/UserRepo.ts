@@ -122,6 +122,11 @@ const UserRepo = {
     }
   },
 
+  // TODO
+  async logout(): Promise<boolean> {
+    return true
+  },
+
   async updateUserIsActive(userId: number, isActive: boolean): Promise<boolean | null> {
     try {
       await prisma.user.update({
