@@ -2,11 +2,13 @@ import { prismaClient as prisma } from '..'
 import { User, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { UserDTO } from '../models/UserDTO'
-import { checkPasswordHash, createTokens, hashPassword } from '../../auth/authUtils'
+import { checkPasswordHash, createTokens, generateSessionId, hashPassword } from '../../auth/authUtils'
 import { UserLogin } from '../../routes/access/schema'
 import { Paginated, PaginatedSearchQuery, RepoResponse } from 'types'
 import { ErrorType } from '../../core/errors'
 import RefreshTokenRepo from './RefreshTokenRepo'
+import { redis } from '../../cache'
+import { redisGet, redisSet } from '../../cache/repository'
 
 const UserRepo = {
   // USE ONLY IN THIS SCOPE
@@ -73,7 +75,9 @@ const UserRepo = {
     }
   },
 
-  async login(data: UserLogin): Promise<RepoResponse<{ user: UserDTO; accessToken: string; refreshToken: string }>> {
+  async login(
+    data: UserLogin
+  ): Promise<RepoResponse<{ user: UserDTO; accessToken: string; refreshToken: string; sessionId: string }>> {
     try {
       const user = await UserRepo.findByEmail(data.email)
       if (!user) {
@@ -98,6 +102,8 @@ const UserRepo = {
       }
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
+      const sessionId = generateSessionId()
+
       if (!accessToken || !refreshToken)
         return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not create tokens' }]
 
@@ -107,7 +113,9 @@ const UserRepo = {
         return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not update user status' }]
       }
 
-      return [{ user: userDTO, accessToken, refreshToken }, null]
+      await redisSet(sessionId, JSON.stringify({ accessToken, refreshToken }), 3600) // expires in 1h
+
+      return [{ user: userDTO, accessToken, refreshToken, sessionId }, null]
     } catch (error: any) {
       Logger.error(`Error login in user: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]

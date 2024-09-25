@@ -6,6 +6,7 @@ import RefreshTokenRepo from '../../database/repository/RefreshTokenRepo'
 import { validator } from '../../core/validator'
 import { Access } from './schema'
 import UserRepo from '../../database/repository/UserRepo'
+import { redisDelete } from '../../cache/repository'
 
 const router = express.Router()
 
@@ -13,8 +14,8 @@ router.post(
   '/logout',
   validator(Access.logout),
   asyncHandler(async (request, response, next) => {
-    const { id } = request.body
-    if (!id) return next({ type: ErrorType.BAD_REQUEST, message: 'User id is required' })
+    const { id, sessionId } = request.body
+    if (!id || !sessionId) return next({ type: ErrorType.BAD_REQUEST, message: 'User id is required' })
 
     const [isRefreshTokenDeleted, error] = await RefreshTokenRepo.deleteByUserId(id)
     if (error) return next({ type: error.type, message: error.errorMessage })
@@ -25,6 +26,9 @@ router.post(
     // TODO not hadled
     response.clearCookie('accessToken')
     response.clearCookie('refreshToken')
+    response.clearCookie('sessionId')
+
+    redisDelete(sessionId)
 
     return SuccessResponse('Logout succeeded', response)
   })
