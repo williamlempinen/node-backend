@@ -9,12 +9,12 @@ import signup from './access/singup'
 import login from './access/login'
 import logout from './access/logout'
 import refreshToken from './access/refreshToken'
+import validateSession from '../auth/validateSession'
 
 import authenticate from '../auth/authenticate'
 
 import activeUsers from './users/activeUsers'
 import searchUsers from './users/searchUsers'
-import { redisGet } from '../cache/repository'
 
 const rootRouter = express.Router()
 
@@ -38,6 +38,7 @@ rootRouter.use('/access', signup)
 rootRouter.use('/access', login)
 rootRouter.use('/access', logout)
 rootRouter.use('/access', refreshToken)
+rootRouter.use('/access', validateSession)
 // -----------------------------------------------
 
 // ------------------ USERS ----------------------

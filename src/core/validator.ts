@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { ZodSchema, ZodError } from 'zod'
-import { BadRequestResponse } from './responses'
+import { AuthFailureResponse, BadRequestResponse } from './responses'
 import Logger from './Logger'
 
 export enum ValidationSource {
@@ -20,6 +20,11 @@ export const validator = (schema: ZodSchema<any>, source: ValidationSource = Val
       if (error instanceof ZodError) {
         Logger.error('[validator catch, zod]: Invalid data provided in validator')
         Logger.error(`[validator catch, zod]: Request in validator: ${JSON.stringify(request[source])}`)
+
+        if (source === ValidationSource.HEADERS) {
+          return AuthFailureResponse('Unauthorized', response)
+        }
+
         return BadRequestResponse('Invalid data provided', response)
       }
       Logger.error('[validator catch, !zod]: Error in validator')
