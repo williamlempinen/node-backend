@@ -11,7 +11,7 @@ import Logger from '../core/Logger'
 const router = express.Router()
 
 router.use(
-  validator(Auth.authenticate, ValidationSource.HEADERS),
+  validator(Auth.authenticate, ValidationSource.HEADERS, 'authentication middleware'),
   asyncHandler(async (request, response, next) => {
     const accessToken = getAccessToken(request.headers.authorization)
 

@@ -34,8 +34,12 @@ router.post(
     const setStatus = await UserRepo.updateUserIsActive(decodedToken.id, false)
     if (!setStatus) return next({ type: ErrorType.INTERNAL, message: 'Error deleting refresh token' })
 
+    Logger.warn('LOGGING OUT')
+    // --------------------------------------------------------------------------
+    response.clearCookie('accessToken', { httpOnly: true, sameSite: 'strict' })
+    response.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict' })
     redisDelete(sessionId)
-
+    // --------------------------------------------------------------------------
     return SuccessResponse('Logout succeeded', response)
   })
 )

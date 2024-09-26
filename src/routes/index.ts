@@ -37,8 +37,12 @@ rootRouter.get('/access', async (request: Request, response: Response) => {
 rootRouter.use('/access', signup)
 rootRouter.use('/access', login)
 rootRouter.use('/access', logout)
-rootRouter.use('/access', refreshToken)
 rootRouter.use('/access', validateSession)
+
+// ------- USING AUTHENTICATE MIDDLEWARE ---------
+rootRouter.use('/access', refreshToken)
+// -----------------------------------------------
+
 // -----------------------------------------------
 
 // ------------------ USERS ----------------------

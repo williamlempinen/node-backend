@@ -7,13 +7,17 @@ export enum ValidationSource {
   BODY = 'body',
   QUERY = 'query',
   PARAMS = 'params',
-  HEADERS = 'headers'
+  HEADERS = 'headers',
+  COOKIES = 'cookies'
 }
 
-export const validator = (schema: ZodSchema<any>, source: ValidationSource = ValidationSource.BODY) => {
+export const validator = (schema: ZodSchema<any>, source: ValidationSource = ValidationSource.BODY, where?: string) => {
   return (request: Request, response: Response, next: NextFunction) => {
     try {
-      Logger.warn(`[validator try]`)
+      Logger.warn(`[validator try]: ${JSON.stringify(request[source])}`)
+      {
+        where && Logger.info(`FROM WHERE: ${where}`)
+      }
       schema.parse(request[source])
       next()
     } catch (error: any) {

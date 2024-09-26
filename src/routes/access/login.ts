@@ -19,7 +19,16 @@ router.post(
       return next({ type: error.type, message: error.errorMessage })
     }
 
-    Logger.info(`Login user: ${JSON.stringify(data)}`)
+    Logger.info(`LOGIN USER AND DATA FOR CLIENT: ${JSON.stringify(data)}`)
+
+    response.cookie('accessToken', data?.accessToken, {
+      httpOnly: true,
+      sameSite: 'strict'
+    })
+    response.cookie('refreshToken', data?.refreshToken, {
+      httpOnly: true,
+      sameSite: 'strict'
+    })
 
     return SuccessResponse('Login succeeded', response, data)
   })

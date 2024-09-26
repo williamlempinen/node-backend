@@ -1,5 +1,5 @@
 import express from 'express'
-import { validator } from '../core/validator'
+import { ValidationSource, validator } from '../core/validator'
 import { Auth } from './schema'
 import { asyncHandler } from '../core/asyncHandler'
 import Logger from '../core/Logger'
@@ -13,7 +13,7 @@ const router = express.Router()
 
 router.post(
   '/validate-session',
-  validator(Auth.validate),
+  validator(Auth.validate, ValidationSource.BODY, 'valiate-session'),
   asyncHandler(async (request, response, next) => {
     const { sessionId } = request.body
 
@@ -22,16 +22,28 @@ router.post(
       return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })
     }
 
-    Logger.warn('SESSION: ', sessionId)
     const isValidSession = await redisGet(sessionId)
     if (!isValidSession || !JSON.parse(isValidSession).accessToken || !JSON.parse(isValidSession).refreshToken)
       return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })
 
-    const decodedToken = verifyJwtToken(JSON.parse(isValidSession).accessToken)
+    const accessToken = JSON.parse(isValidSession).accessToken
+    const refreshToken = JSON.parse(isValidSession).refreshToken
+
+    const decodedToken = verifyJwtToken(accessToken)
     if (!decodedToken || !decodedToken.id) return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })
 
     const [user, error] = await UserRepo.findById(decodedToken.id)
     if (error) return next({ type: error.type, errorMessage: error.errorMessage })
+
+    response.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      sameSite: 'strict'
+    })
+
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'strict'
+    })
 
     return SuccessResponse('Authenticated', response, user)
   })
