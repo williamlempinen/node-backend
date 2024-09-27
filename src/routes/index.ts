@@ -15,6 +15,7 @@ import authenticate from '../auth/authenticate'
 
 import activeUsers from './users/activeUsers'
 import searchUsers from './users/searchUsers'
+import Logger from '../core/Logger'
 
 const rootRouter = express.Router()
 
@@ -23,9 +24,9 @@ rootRouter.get('/', async (request: Request, response: Response) => {
 })
 
 // ------------------ TESTING --------------------
-rootRouter.use('/test', testGet)
-rootRouter.use('/test', testPost)
-rootRouter.use('/test', testDatabase)
+//rootRouter.use('/test', testGet)
+//rootRouter.use('/test', testPost)
+//rootRouter.use('/test', testDatabase)
 // -----------------------------------------------
 
 // ------------------ ACCESS ---------------------
@@ -50,7 +51,11 @@ rootRouter.use('/users', activeUsers)
 rootRouter.use('/users', searchUsers)
 // -----------------------------------------------
 
+rootRouter.use('/protected', authenticate)
 rootRouter.get('/protected', authenticate, async (request: Request, response: Response) => {
+  Logger.info('REQUEST: ', JSON.stringify(request.headers))
+  Logger.info('REQUEST: ', JSON.stringify(request.cookies))
+  Logger.info('REQUEST: ', JSON.stringify(request.body))
   response.send(`You are authorized to see this message, ${JSON.stringify(request.body)}`)
 })
 

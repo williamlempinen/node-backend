@@ -35,16 +35,6 @@ router.post(
     const [user, error] = await UserRepo.findById(decodedToken.id)
     if (error) return next({ type: error.type, errorMessage: error.errorMessage })
 
-    response.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      sameSite: 'strict'
-    })
-
-    response.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      sameSite: 'strict'
-    })
-
     return SuccessResponse('Authenticated', response, user)
   })
 )
