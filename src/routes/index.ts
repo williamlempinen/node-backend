@@ -9,12 +9,15 @@ import signup from './access/singup'
 import login from './access/login'
 import logout from './access/logout'
 import refreshToken from './access/refreshToken'
-import validateSession from '../auth/validateSession'
 
+import validateSession from '../auth/validateSession'
 import authenticate from '../auth/authenticate'
 
 import activeUsers from './users/activeUsers'
 import searchUsers from './users/searchUsers'
+
+import createConversation from './conversation/createConversation'
+
 import Logger from '../core/Logger'
 
 const rootRouter = express.Router()
@@ -49,6 +52,10 @@ rootRouter.use('/access', refreshToken)
 // ------------------ USERS ----------------------
 rootRouter.use('/users', activeUsers)
 rootRouter.use('/users', searchUsers)
+// -----------------------------------------------
+
+// --------------- CONVERSATION ------------------
+rootRouter.use('/conversation', createConversation)
 // -----------------------------------------------
 
 rootRouter.use('/protected', authenticate)

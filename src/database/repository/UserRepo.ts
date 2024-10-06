@@ -93,7 +93,7 @@ const UserRepo = {
 
       const userDTO = UserRepo.userToDTO(user)
 
-      // DONT'T HANDLE THE ERROR
+      // DO NOT HANDLE THE ERROR
       const [existingRefreshToken, error] = await RefreshTokenRepo.findByUserId(userDTO.id)
 
       if (existingRefreshToken) {

@@ -10,7 +10,11 @@ const errorMiddleware = (error: any, request: Request, response: Response, next:
     return handleError(error.type, error.message || 'An error occurred', response)
   }
 
-  return handleError(ErrorType.INTERNAL, 'An unexpected error occurred (super general)', response)
+  return handleError(
+    ErrorType.INTERNAL,
+    'An unexpected error occurred, error not catched from defined error types.',
+    response
+  )
 }
 
 export default errorMiddleware
