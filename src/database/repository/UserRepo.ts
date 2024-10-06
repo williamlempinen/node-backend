@@ -7,7 +7,6 @@ import { UserLogin } from '../../routes/access/schema'
 import { Paginated, PaginatedSearchQuery, RepoResponse } from 'types'
 import { ErrorType } from '../../core/errors'
 import RefreshTokenRepo from './RefreshTokenRepo'
-import { redis } from '../../cache'
 import { redisGet, redisSet } from '../../cache/repository'
 
 const UserRepo = {
@@ -146,6 +145,7 @@ const UserRepo = {
     try {
       const activeUsers = await prisma.user.findMany({ where: { is_active: true } })
       if (!activeUsers) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+
       const userDTOs: UserDTO[] = activeUsers
         .map((user) => UserRepo.userToDTO(user))
         .filter((userDTO) => userDTO !== null)
