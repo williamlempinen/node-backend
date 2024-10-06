@@ -1,6 +1,5 @@
 import { RepoResponse } from 'types'
 import { prismaClient as prisma } from '..'
-import { Conversation, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { ErrorType } from '../../core/errors'
 

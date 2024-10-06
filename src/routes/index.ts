@@ -18,6 +18,8 @@ import searchUsers from './users/searchUsers'
 
 import createConversation from './conversation/createConversation'
 
+import createContact from './contact/createContact'
+
 import Logger from '../core/Logger'
 
 const rootRouter = express.Router()
@@ -56,6 +58,10 @@ rootRouter.use('/users', searchUsers)
 
 // --------------- CONVERSATION ------------------
 rootRouter.use('/conversation', createConversation)
+// -----------------------------------------------
+
+// ----------------- CONTACT ---------------------
+rootRouter.use('/contact', createContact)
 // -----------------------------------------------
 
 rootRouter.use('/protected', authenticate)
