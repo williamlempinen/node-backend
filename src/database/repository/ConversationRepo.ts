@@ -33,7 +33,34 @@ const ConversationRepo = {
       Logger.error(`Error occurred: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
+  },
+
+  async deleteConversation(id: number): Promise<RepoResponse<boolean>> {
+    try {
+      const isConversationDeleted = await prisma.conversation.delete({
+        where: {
+          id: id
+        }
+      })
+      if (!isConversationDeleted)
+        return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Could not delete conversation' }]
+
+      return [true, null]
+    } catch (error: any) {
+      Logger.error(`Error deleting conversation: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
   }
+
+  // TODO
+  //async getConversations(userId: number): Promise<RepoResponse<Paginated<create-type>>> {
+  //  try {
+  //
+  //    //return [{ [] as create-type }, null]
+  //  } catch (error: any) {
+  //    Logger.error(`Error finding conversations: ${error}`)
+  //    return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+  //  }
 }
 
 export default ConversationRepo

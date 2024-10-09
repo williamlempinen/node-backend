@@ -1,7 +1,8 @@
-import { RepoResponse } from 'types'
+import { Paginated, RepoResponse } from 'types'
 import Logger from '../../core/Logger'
 import { ErrorType } from '../../core/errors'
 import { prismaClient as prisma } from '..'
+import { UserDTO } from '../models/UserDTO'
 
 type ContactPairType = {
   userId: number
@@ -72,6 +73,17 @@ const ContactRepo = {
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   }
+
+  // TODO
+  //async getContacts(userId: number): Promise<RepoResponse<Paginated<UserDTO>>> {
+  //  try {
+  //
+  //    //return [{ [] as UserDTO }, null]
+  //  } catch (error: any) {
+  //    Logger.error(`Error finding contacts: ${error}`)
+  //    return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+  //  }
+  //}
 }
 
 export default ContactRepo
