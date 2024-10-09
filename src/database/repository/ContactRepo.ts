@@ -30,6 +30,26 @@ const ContactRepo = {
     }
   },
 
+  async deleteContact(data: ContactPairType): Promise<RepoResponse<boolean>> {
+    try {
+      const isContactDeleted = await prisma.contact.delete({
+        where: {
+          user_id_contact_id: {
+            user_id: data.userId,
+            contact_id: data.contactId
+          }
+        }
+      })
+      if (!isContactDeleted)
+        return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Could not delete the contact' }]
+
+      return [true, null]
+    } catch (error: any) {
+      Logger.error(`Error occurred deleting contact: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
+  },
+
   async isUserContact(data: ContactPairType): Promise<RepoResponse<IsUserContactType>> {
     try {
       const foundUser = await prisma.contact.findFirst({

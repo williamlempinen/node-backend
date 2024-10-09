@@ -5,8 +5,11 @@ import Conversation from './schema'
 import Logger from '../../core/Logger'
 import ConversationRepo from '../../database/repository/ConversationRepo'
 import { SuccessResponse } from '../../core/responses'
+import authenticate from '../../auth/authenticate'
 
 const router = express.Router()
+
+router.use('/', authenticate)
 
 router.post(
   '/create-conversation',

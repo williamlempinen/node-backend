@@ -4,10 +4,12 @@ import { asyncHandler } from '../../core/asyncHandler'
 import Contact from './schema'
 import Logger from '../../core/Logger'
 import ContactRepo from '../../database/repository/ContactRepo'
-import { type } from 'os'
 import { SuccessResponse } from '../../core/responses'
+import authenticate from '../../auth/authenticate'
 
 const router = express.Router()
+
+router.use('/', authenticate)
 
 router.post(
   '/create-contact',

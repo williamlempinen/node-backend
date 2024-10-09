@@ -46,9 +46,9 @@ rootRouter.use('/access', logout)
 rootRouter.use('/access', validateSession)
 
 // ------- USING AUTHENTICATE MIDDLEWARE ---------
-rootRouter.use('/access', refreshToken)
 // -----------------------------------------------
 
+rootRouter.use('/access', refreshToken)
 // -----------------------------------------------
 
 // ------------------ USERS ----------------------
@@ -64,6 +64,7 @@ rootRouter.use('/conversation', createConversation)
 rootRouter.use('/contact', createContact)
 // -----------------------------------------------
 
+// -----------------------------------------------
 rootRouter.use('/protected', authenticate)
 rootRouter.get('/protected', authenticate, async (request: Request, response: Response) => {
   Logger.info('REQUEST: ', JSON.stringify(request.headers))
