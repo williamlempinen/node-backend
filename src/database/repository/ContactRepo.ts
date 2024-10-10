@@ -64,6 +64,7 @@ const ContactRepo = {
       const isContact = !!foundUser
 
       Logger.warn('Is contact: ', isContact)
+
       return [isContact, null]
     } catch (error: any) {
       Logger.error(`Error occurred creating contact: ${error}`)

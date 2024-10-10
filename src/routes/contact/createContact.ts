@@ -19,8 +19,7 @@ router.post(
 
     const [isAlreadyContacts, error] = await ContactRepo.isUserContact(request.body)
     if (error) return next({ type: error.type, errorMessage: error.errorMessage })
-    if (isAlreadyContacts?.isContact)
-      return SuccessResponse('User is already in your contacts', response, isAlreadyContacts)
+    if (isAlreadyContacts) return SuccessResponse('User is already in your contacts', response, isAlreadyContacts)
 
     const [addUserToContacts, errorAdding] = await ContactRepo.createContact(request.body)
     if (errorAdding) return next({ type: errorAdding.type, errorMessage: errorAdding.errorMessage })
