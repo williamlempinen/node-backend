@@ -9,11 +9,8 @@ type ContactPairType = {
   contactId: number
 }
 
-type IsUserContactType = {
-  isContact: boolean
-}
-
 const ContactRepo = {
+  // SHOULD IT RETURN CONTACT
   async createContact(data: ContactPairType): Promise<RepoResponse<boolean>> {
     try {
       const createdContact = await prisma.contact.create({
@@ -51,7 +48,7 @@ const ContactRepo = {
     }
   },
 
-  async isUserContact(data: ContactPairType): Promise<RepoResponse<IsUserContactType>> {
+  async isUserContact(data: ContactPairType): Promise<RepoResponse<boolean>> {
     try {
       const foundUser = await prisma.contact.findFirst({
         where: {
@@ -67,7 +64,7 @@ const ContactRepo = {
       const isContact = !!foundUser
 
       Logger.warn('Is contact: ', isContact)
-      return [{ isContact }, null]
+      return [isContact, null]
     } catch (error: any) {
       Logger.error(`Error occurred creating contact: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]

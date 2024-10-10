@@ -9,6 +9,7 @@ type CreateConversationType = {
 }
 
 const ConversationRepo = {
+  // SHOULD IT RETURN CONVERSATION
   async createConversation(data: CreateConversationType): Promise<RepoResponse<boolean>> {
     try {
       Logger.info(`Received data in repo: ${JSON.stringify(data)}`)
