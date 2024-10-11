@@ -1,8 +1,7 @@
-import { Paginated, RepoResponse } from 'types'
+import { Paginated, PaginatedSearchQuery, RepoResponse } from 'types'
 import Logger from '../../core/Logger'
 import { ErrorType } from '../../core/errors'
 import { prismaClient as prisma } from '..'
-import { UserDTO } from '../models/UserDTO'
 import { ContactDTO } from '../models/ContactDTO'
 
 type ContactPairType = {
@@ -72,18 +71,29 @@ const ContactRepo = {
       Logger.error(`Error occurred creating contact: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
-  }
+  },
 
-  // TODO
-  //async getContacts(userId: number): Promise<RepoResponse<Paginated<UserDTO>>> {
-  //  try {
-  //
-  //    //return [{ [] as UserDTO }, null]
-  //  } catch (error: any) {
-  //    Logger.error(`Error finding contacts: ${error}`)
-  //    return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
-  //  }
-  //}
+  async getContacts({ page = 1, limit = 10 }: PaginatedSearchQuery): Promise<RepoResponse<Paginated<ContactDTO>>> {
+    try {
+      const skip = (page - 1) * limit
+
+      const totalCount = await prisma.contact.count()
+      const contacts = await prisma.contact.findMany({
+        skip: skip,
+        take: limit
+      })
+
+      if (!totalCount || !contacts) {
+        Logger.error(`Error getting contacts`)
+        return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Error finding contacts' }]
+      }
+
+      return [{ data: contacts, page, limit, totalCount }, null]
+    } catch (error: any) {
+      Logger.error(`Error finding contacts: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
+  }
 }
 
 export default ContactRepo

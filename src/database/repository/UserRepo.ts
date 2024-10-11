@@ -182,7 +182,7 @@ const UserRepo = {
 
       const userDTOs: UserDTO[] = users.map((user) => UserRepo.userToDTO(user)).filter((userDTO) => userDTO !== null)
 
-      return [{ data: userDTOs, totalCount, page, limit }, null]
+      return [{ data: userDTOs, page, limit, totalCount }, null]
     } catch (error: any) {
       Logger.error(`Error searching users: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]

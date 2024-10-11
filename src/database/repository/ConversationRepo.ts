@@ -1,7 +1,9 @@
-import { RepoResponse } from 'types'
+import { Paginated, PaginatedSearchQuery, RepoResponse } from 'types'
 import { prismaClient as prisma } from '..'
+import { Conversation, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { ErrorType } from '../../core/errors'
+import { ConversationDTO } from '../models/ConversationDTO'
 
 type CreateConversationType = {
   isGroup?: boolean
@@ -9,8 +11,7 @@ type CreateConversationType = {
 }
 
 const ConversationRepo = {
-  // SHOULD IT RETURN CONVERSATION
-  async createConversation(data: CreateConversationType): Promise<RepoResponse<boolean>> {
+  async createConversation(data: CreateConversationType): Promise<RepoResponse<ConversationDTO>> {
     try {
       Logger.info(`Received data in repo: ${JSON.stringify(data)}`)
 
@@ -29,7 +30,7 @@ const ConversationRepo = {
 
       Logger.info(`Created conversation in repo: ${JSON.stringify(createdConversation)}`)
 
-      return [true, null]
+      return [createdConversation, null]
     } catch (error: any) {
       Logger.error(`Error occurred: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
@@ -51,17 +52,32 @@ const ConversationRepo = {
       Logger.error(`Error deleting conversation: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
-  }
+  },
 
-  // TODO
-  //async getConversations(userId: number): Promise<RepoResponse<Paginated<create-type>>> {
-  //  try {
-  //
-  //    //return [{ [] as create-type }, null]
-  //  } catch (error: any) {
-  //    Logger.error(`Error finding conversations: ${error}`)
-  //    return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
-  //  }
+  async getConversations({
+    page = 1,
+    limit = 10
+  }: PaginatedSearchQuery): Promise<RepoResponse<Paginated<ConversationDTO>>> {
+    try {
+      const skip = (page - 1) * limit
+
+      const totalCount = await prisma.conversation.count()
+      const conversations = await prisma.conversation.findMany({
+        skip: skip,
+        take: limit
+      })
+
+      if (!totalCount || !conversations) {
+        Logger.error(`Error getting conversations`)
+        return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Error finding conversations' }]
+      }
+
+      return [{ data: conversations, page, limit, totalCount }, null]
+    } catch (error: any) {
+      Logger.error(`Error finding conversations: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
+  }
 }
 
 export default ConversationRepo

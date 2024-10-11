@@ -16,7 +16,7 @@ export type Paginated<T> = {
 }
 
 export type PaginatedSearchQuery = {
-  searchQuery: string
+  searchQuery?: string
   page?: number
   limit?: number
 }
