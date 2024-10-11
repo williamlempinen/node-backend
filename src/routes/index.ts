@@ -20,6 +20,8 @@ import createConversation from './conversation/createConversation'
 
 import createContact from './contact/createContact'
 
+import createMessage from './message/createMessage'
+
 import Logger from '../core/Logger'
 
 const rootRouter = express.Router()
@@ -62,6 +64,10 @@ rootRouter.use('/conversation', createConversation)
 
 // ----------------- CONTACT ---------------------
 rootRouter.use('/contact', createContact)
+// -----------------------------------------------
+
+// ----------------- MESSAGE ---------------------
+rootRouter.use('/message', createMessage)
 // -----------------------------------------------
 
 // -----------------------------------------------

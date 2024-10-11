@@ -3,6 +3,7 @@ import Logger from '../../core/Logger'
 import { ErrorType } from '../../core/errors'
 import { prismaClient as prisma } from '..'
 import { UserDTO } from '../models/UserDTO'
+import { ContactDTO } from '../models/ContactDTO'
 
 type ContactPairType = {
   userId: number
@@ -10,8 +11,7 @@ type ContactPairType = {
 }
 
 const ContactRepo = {
-  // SHOULD IT RETURN CONTACT
-  async createContact(data: ContactPairType): Promise<RepoResponse<boolean>> {
+  async createContact(data: ContactPairType): Promise<RepoResponse<ContactDTO>> {
     try {
       const createdContact = await prisma.contact.create({
         data: {
@@ -21,7 +21,9 @@ const ContactRepo = {
       })
       if (!createdContact) return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Could not create contact' }]
 
-      return [true, null]
+      Logger.info(`Created contact: ${createdContact}`)
+
+      return [createdContact, null]
     } catch (error: any) {
       Logger.error(`Error occurred creating contact: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
