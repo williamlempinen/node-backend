@@ -17,6 +17,7 @@ import activeUsers from './users/activeUsers'
 import searchUsers from './users/searchUsers'
 
 import createConversation from './conversation/createConversation'
+import getConversations from './conversation/getConversations'
 
 import createContact from './contact/createContact'
 
@@ -60,6 +61,7 @@ rootRouter.use('/users', searchUsers)
 
 // --------------- CONVERSATION ------------------
 rootRouter.use('/conversation', createConversation)
+rootRouter.use('/conversation', getConversations)
 // -----------------------------------------------
 
 // ----------------- CONTACT ---------------------

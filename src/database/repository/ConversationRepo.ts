@@ -54,15 +54,26 @@ const ConversationRepo = {
     }
   },
 
-  async getConversations({
-    page = 1,
-    limit = 10
-  }: PaginatedSearchQuery): Promise<RepoResponse<Paginated<ConversationDTO>>> {
+  async getConversations(
+    userId: number,
+    { page = 1, limit = 10 }: PaginatedSearchQuery
+  ): Promise<RepoResponse<Paginated<ConversationDTO>>> {
     try {
       const skip = (page - 1) * limit
 
-      const totalCount = await prisma.conversation.count()
+      const totalCount = await prisma.conversation.count({
+        where: {
+          participants: {
+            some: { id: userId }
+          }
+        }
+      })
       const conversations = await prisma.conversation.findMany({
+        where: {
+          participants: {
+            some: { id: userId }
+          }
+        },
         skip: skip,
         take: limit
       })

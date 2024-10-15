@@ -4,6 +4,9 @@ const Conversation = {
   createConversation: z.object({
     isGroup: z.boolean().optional().default(false),
     participants: z.array(z.string().min(1))
+  }),
+  getConversation: z.object({
+    userId: z.string().min(1)
   })
 }
 
