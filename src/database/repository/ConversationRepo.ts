@@ -75,7 +75,17 @@ const ConversationRepo = {
           }
         },
         skip: skip,
-        take: limit
+        take: limit,
+        include: {
+          messages: true,
+          participants: {
+            select: {
+              id: true,
+              username: true,
+              profile_picture_url: true
+            }
+          }
+        }
       })
 
       if (!totalCount || !conversations) {
