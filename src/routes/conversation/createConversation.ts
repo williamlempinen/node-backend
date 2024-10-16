@@ -9,7 +9,7 @@ import authenticate from '../../auth/authenticate'
 
 const router = express.Router()
 
-router.use('/', authenticate)
+//router.use('/', authenticate)
 
 router.post(
   '/create-conversation',
@@ -18,7 +18,10 @@ router.post(
     Logger.info(`Request: ${JSON.stringify(request.body)}`)
 
     const [conversation, error] = await ConversationRepo.createConversation(request.body)
-    if (error) return next({ type: error.type, errorMessage: error.errorMessage })
+    if (error) {
+      Logger.error(`Error: ${JSON.stringify(error)}`)
+      return next({ type: error.type, message: error.errorMessage })
+    }
 
     Logger.info(`Created conversation: ${conversation}`)
     return SuccessResponse('Conversation created successfully', response, conversation)

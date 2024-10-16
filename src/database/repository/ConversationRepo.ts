@@ -20,11 +20,16 @@ const ConversationRepo = {
       let groupName = ''
 
       if (!data.isGroup) {
-        if (data.participants.length > 2)
+        Logger.info('Conversation is not group')
+
+        if (data.participants.length > 2) {
+          Logger.error('Conversation is not group and too many participants added')
+
           return [
             null,
             { type: ErrorType.BAD_REQUEST, errorMessage: 'Private conversations can only have two participants' }
           ]
+        }
 
         const [p1, e1] = await UserRepo.findById(parseInt(data.participants[0]))
         const [p2, e2] = await UserRepo.findById(parseInt(data.participants[1]))

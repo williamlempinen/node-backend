@@ -25,7 +25,7 @@ router.get(
       page: page,
       limit: 10
     })
-    if (error) return next({ type: error.type, errorMessage: error.errorMessage })
+    if (error) return next({ type: error.type, message: error.errorMessage })
 
     return SuccessResponse('Conversations found', response, conversationsPage)
   })

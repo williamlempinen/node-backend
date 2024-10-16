@@ -18,7 +18,7 @@ router.post(
     Logger.info('Creating message')
 
     const [createMessage, error] = await MessageRepo.createMessage(request.body)
-    if (error) return next({ type: error.type, errorMessage: error.errorMessage })
+    if (error) return next({ type: error.type, message: error.errorMessage })
 
     return SuccessResponse('Message created', response, createMessage)
   })
