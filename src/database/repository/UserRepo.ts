@@ -182,7 +182,10 @@ const UserRepo = {
 
       const userDTOs: UserDTO[] = users.map((user) => UserRepo.userToDTO(user)).filter((userDTO) => userDTO !== null)
 
-      return [{ data: userDTOs, page, limit, totalCount }, null]
+      const totalPages = Math.ceil(totalCount / limit)
+      const hasNextPage = page < totalPages
+
+      return [{ data: userDTOs, page, limit, totalCount, totalPages, hasNextPage }, null]
     } catch (error: any) {
       Logger.error(`Error searching users: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]

@@ -13,6 +13,8 @@ export type Paginated<T> = {
   page: number
   limit: number
   totalCount?: number
+  totalPages?: number
+  hasNextPage?: boolean // optional for development
 }
 
 export type PaginatedSearchQuery = {

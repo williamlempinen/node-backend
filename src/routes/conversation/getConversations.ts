@@ -12,14 +12,19 @@ const router = express.Router()
 router.use('/', authenticate)
 
 router.get(
-  `/get-conversations/:userId`,
+  `/get-conversations/:userId/:pageNumber`,
   validator(Conversation.getConversation, ValidationSource.PARAMS),
   asyncHandler(async (request, response, next) => {
-    const { userId } = request.params
+    const { userId, pageNumber } = request.params
 
     Logger.info(`Get conversations: ${userId}`)
 
-    const [conversationsPage, error] = await ConversationRepo.getConversations(parseInt(userId), { page: 1, limit: 10 })
+    let page = parseInt(pageNumber) || 1
+
+    const [conversationsPage, error] = await ConversationRepo.getConversations(parseInt(userId), {
+      page: page,
+      limit: 10
+    })
     if (error) return next({ type: error.type, errorMessage: error.errorMessage })
 
     return SuccessResponse('Conversations found', response, conversationsPage)

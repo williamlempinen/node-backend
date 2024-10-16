@@ -4,10 +4,12 @@ import { Conversation, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { ErrorType } from '../../core/errors'
 import { ConversationDTO } from '../models/ConversationDTO'
+import UserRepo from './UserRepo'
 
 type CreateConversationType = {
   isGroup?: boolean
   participants: string[]
+  groupName?: string
 }
 
 const ConversationRepo = {
@@ -15,9 +17,30 @@ const ConversationRepo = {
     try {
       Logger.info(`Received data in repo: ${JSON.stringify(data)}`)
 
+      let groupName = ''
+
+      if (!data.isGroup) {
+        if (data.participants.length > 2)
+          return [
+            null,
+            { type: ErrorType.BAD_REQUEST, errorMessage: 'Private conversations can only have two participants' }
+          ]
+
+        const [p1, e1] = await UserRepo.findById(parseInt(data.participants[0]))
+        const [p2, e2] = await UserRepo.findById(parseInt(data.participants[1]))
+
+        if (e1 || e2)
+          return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Cannot find users to create conversation' }]
+
+        groupName = p1?.username + ' <> ' + p2?.username
+      }
+
+      if (data.isGroup && !data.groupName) groupName = 'Default group name'
+
       const createdConversation = await prisma.conversation.create({
         data: {
           is_group: data.isGroup ?? false,
+          group_name: data.groupName ?? groupName,
           participants: {
             connect: data.participants.map((pId) => ({
               id: parseInt(pId)
@@ -68,6 +91,7 @@ const ConversationRepo = {
           }
         }
       })
+
       const conversations = await prisma.conversation.findMany({
         where: {
           participants: {
@@ -93,7 +117,10 @@ const ConversationRepo = {
         return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Error finding conversations' }]
       }
 
-      return [{ data: conversations, page, limit, totalCount }, null]
+      const totalPages = Math.ceil(totalCount / limit)
+      const hasNextPage = page < totalPages
+
+      return [{ data: conversations, page, limit, totalCount, totalPages, hasNextPage }, null]
     } catch (error: any) {
       Logger.error(`Error finding conversations: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]

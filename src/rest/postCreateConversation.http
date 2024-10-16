@@ -2,6 +2,7 @@ POST http://localhost:8000/conversation/create-conversation
 Content-Type: application/json
 
 {
-  "isGroup": false,
-  "participants": ["2", "4", "3"]
+  "isGroup": true,
+  "groupName": "Helous",
+  "participants": ["2","6","7"]
 }
