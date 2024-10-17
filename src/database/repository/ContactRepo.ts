@@ -73,12 +73,23 @@ const ContactRepo = {
     }
   },
 
-  async getContacts({ page = 1, limit = 10 }: PaginatedSearchQuery): Promise<RepoResponse<Paginated<ContactDTO>>> {
+  async getContacts(
+    userId: number,
+    { page = 1, limit = 10 }: PaginatedSearchQuery
+  ): Promise<RepoResponse<Paginated<ContactDTO>>> {
     try {
       const skip = (page - 1) * limit
 
-      const totalCount = await prisma.contact.count()
+      const totalCount = await prisma.contact.count({
+        where: {
+          user_id: userId
+        }
+      })
+
       const contacts = await prisma.contact.findMany({
+        where: {
+          user_id: userId
+        },
         skip: skip,
         take: limit
       })
@@ -88,7 +99,10 @@ const ContactRepo = {
         return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Error finding contacts' }]
       }
 
-      return [{ data: contacts, page, limit, totalCount }, null]
+      const totalPages = Math.ceil(totalCount / limit)
+      const hasNextPage = page < totalPages
+
+      return [{ data: contacts, page, limit, totalCount, totalPages, hasNextPage }, null]
     } catch (error: any) {
       Logger.error(`Error finding contacts: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
