@@ -15,6 +15,10 @@ wss.on('connection', (ws, request) => {
   ws.on('close', () => {
     Logger.info('WebSocket connection closed')
   })
+
+  ws.on('error', (err) => {
+    Logger.error(`WebSocket error: ${err.message}`)
+  })
 })
 
 export const handleWebSocketUpgrade = (request: any, socket: any, head: any) => {
