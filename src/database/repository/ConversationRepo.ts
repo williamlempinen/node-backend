@@ -97,6 +97,9 @@ const ConversationRepo = {
         }
       })
 
+      if (totalCount === 0)
+        return [{ data: [], page: 1, limit: 10, totalCount: 0, totalPages: 0, hasNextPage: false }, null]
+
       const conversations = await prisma.conversation.findMany({
         where: {
           participants: {
@@ -116,6 +119,8 @@ const ConversationRepo = {
           }
         }
       })
+
+      Logger.warn('TOTAL COUNT: ', totalCount, ' CONVERSATIONS: ', conversations)
 
       if (!totalCount || !conversations) {
         Logger.error(`Error getting conversations`)

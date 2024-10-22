@@ -17,7 +17,7 @@ router.get(
   asyncHandler(async (request, response, next) => {
     const { userId, pageNumber } = request.params
 
-    Logger.info(`Get conversations: ${userId}`)
+    Logger.info(`Get conversations for user with id: ${userId}`)
 
     let page = parseInt(pageNumber) || 1
 
