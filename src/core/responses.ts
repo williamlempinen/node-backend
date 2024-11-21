@@ -28,6 +28,13 @@ export const BadRequestResponse = (message: string, response: Response) => {
   })
 }
 
+export const ForbiddenResponse = (message: string, response: Response) => {
+  return send(response, StatusCode.FORBIDDEN, {
+    status: StatusCode.FORBIDDEN,
+    message
+  })
+}
+
 export const NotFoundResponse = (message: string, response: Response) => {
   return send(response, StatusCode.NOT_FOUND, {
     status: StatusCode.NOT_FOUND,

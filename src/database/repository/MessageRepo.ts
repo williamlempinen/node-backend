@@ -13,6 +13,23 @@ type MessageDataType = {
 const MessageRepo = {
   async createMessage(data: MessageDataType): Promise<RepoResponse<MessageDTO>> {
     try {
+      const isParticipant = await prisma.conversation.findFirst({
+        where: {
+          id: parseInt(data.conversationId),
+          participants: {
+            some: {
+              id: parseInt(data.senderId)
+            }
+          }
+        },
+        select: {
+          id: true
+        }
+      })
+
+      if (!isParticipant)
+        return [null, { type: ErrorType.FORBIDDEN, errorMessage: 'User is not a participant in this conversation' }]
+
       const message = await prisma.message.create({
         data: {
           is_seen: false,
@@ -32,28 +49,29 @@ const MessageRepo = {
 
   async getMessages(
     conversationId: number,
-    { page = 1, limit = 30 }: PaginatedSearchQuery
+    { page, limit = 30 }: PaginatedSearchQuery
   ): Promise<RepoResponse<Paginated<MessageDTO>>> {
     try {
+      if (!page) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+
       const skip = (page - 1) * limit
 
       const totalCount = await prisma.message.count({
         where: {
           conversation_id: conversationId
-        },
-        skip: skip,
-        take: limit
+        }
       })
-
-      Logger.info('TOTAL COUNT OF MESSAGES: ', totalCount)
-
       if (totalCount === 0)
         return [{ data: [], page: 1, limit: 10, totalCount: 0, totalPages: 0, hasNextPage: false }, null]
+
+      Logger.info('TOTAL COUNT OF MESSAGES: ', JSON.stringify(totalCount))
 
       const messages = await prisma.message.findMany({
         where: {
           conversation_id: conversationId
-        }
+        },
+        skip: skip,
+        take: limit
       })
       if (!messages || !totalCount)
         return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Could not find messages' }]

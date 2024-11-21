@@ -1,8 +1,14 @@
 import { Response } from 'express'
-import { AuthFailureResponse, BadRequestResponse, InternalErrorResponse, NotFoundResponse } from './responses'
+import {
+  AuthFailureResponse,
+  BadRequestResponse,
+  ForbiddenResponse,
+  InternalErrorResponse,
+  NotFoundResponse
+} from './responses'
 
 export enum ErrorType {
-  BAD_TOKEN = 'BadTokenError',
+  FORBIDDEN = 'ForbiddenError',
   TOKEN_EXPIRED = 'TokenExpiredError',
   UNAUTHORIZED = 'AuthFailureError',
   INTERNAL = 'InternalError',
@@ -12,7 +18,8 @@ export enum ErrorType {
 
 export const handleError = (errorType: ErrorType, message: string, response: Response) => {
   switch (errorType) {
-    case ErrorType.BAD_TOKEN:
+    case ErrorType.FORBIDDEN:
+      return ForbiddenResponse(message, response)
     case ErrorType.TOKEN_EXPIRED:
     case ErrorType.UNAUTHORIZED:
       return AuthFailureResponse(message, response)

@@ -112,7 +112,12 @@ const ConversationRepo = {
           updated_at: 'desc'
         },
         include: {
-          messages: true,
+          messages: {
+            take: 30,
+            orderBy: {
+              created_at: 'desc'
+            }
+          },
           participants: {
             select: {
               id: true,
