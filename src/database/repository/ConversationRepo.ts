@@ -108,6 +108,9 @@ const ConversationRepo = {
         },
         skip: skip,
         take: limit,
+        orderBy: {
+          updated_at: 'desc'
+        },
         include: {
           messages: true,
           participants: {

@@ -5,7 +5,7 @@ import { verifyJwtToken } from '../auth/JWT'
 const wss = new WebSocketServer({ noServer: true })
 
 wss.on('connection', (ws, request) => {
-  Logger.info(`New WebSocket connection established`)
+  Logger.info(`New WebSocket connection established, your request: ${request}`)
 
   ws.on('message', (message) => {
     Logger.info(`Received message: ${message}`)
@@ -16,8 +16,9 @@ wss.on('connection', (ws, request) => {
     Logger.info('WebSocket connection closed')
   })
 
-  ws.on('error', (err) => {
-    Logger.error(`WebSocket error: ${err.message}`)
+  ws.on('error', (error) => {
+    Logger.error(`WebSocket error: ${error.message}`)
+    ws.send(`Echo: ${error}`)
   })
 })
 
@@ -29,6 +30,7 @@ export const handleWebSocketUpgrade = (request: any, socket: any, head: any) => 
     wss.handleUpgrade(request, socket, head, (ws) => {
       Logger.info('WebSocket upgrade successful')
       ws.send('Welcome to the WebSocket server!')
+      ws.send(`HEAD: ${JSON.stringify(head)}`)
       wss.emit('connection', ws, request)
     })
   } else {

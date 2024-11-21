@@ -14,16 +14,21 @@ app.use(helmet())
 
 app.use(
   cors({
-    origin: 'http://localhost:5173' // development
+    origin: 'http://localhost:3000' // development
   })
 )
 
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
+// ----------- CONNECTIONS -------------
 connectToDatabase()
 connectRedis()
+// -------------------------------------
 
+// ------------- ROUTER ----------------
 app.use('/', rootRouter)
+// -------------------------------------
 
 setInterval(deleteExpiredRefreshTokens, 60 * 60 * 100)
 

@@ -22,6 +22,7 @@ import getConversations from './conversation/getConversations'
 import createContact from './contact/createContact'
 
 import createMessage from './message/createMessage'
+import getMessages from './message/getMessages'
 
 import Logger from '../core/Logger'
 
@@ -70,6 +71,7 @@ rootRouter.use('/contact', createContact)
 
 // ----------------- MESSAGE ---------------------
 rootRouter.use('/message', createMessage)
+rootRouter.use('/message', getMessages)
 // -----------------------------------------------
 
 // -----------------------------------------------
