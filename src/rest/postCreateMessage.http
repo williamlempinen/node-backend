@@ -2,7 +2,7 @@ POST http://localhost:8000/message/create-message
 Content-Type: application/json
 
 {
-  "content": "Hello World",
-  "senderId": "5",
+  "content": "MiljuskaMiljuskaMiljuskaM iljuskaMiljuskaMiljuskaMiljuskaMilj uskaMiljuskaMiljuskaMiljuskaMilj uskaMilj uskaMiljuskaMilj uskaMiljuskaM iljuskaMiljuska MiljuskaMil j uskaMi ljuskaMiljuska MiljuskaMiljusk aMiljuskaMiljuskaMiljuskaMilju skaMiljuskaMiljuska MiljuskaMi l j uskaMil jus kaMil juska",
+  "senderId": "6",
   "conversationId": "14"
 }

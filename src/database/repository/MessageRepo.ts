@@ -71,7 +71,10 @@ const MessageRepo = {
           conversation_id: conversationId
         },
         skip: skip,
-        take: limit
+        take: limit,
+        orderBy: {
+          created_at: 'desc'
+        }
       })
       if (!messages || !totalCount)
         return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Could not find messages' }]
