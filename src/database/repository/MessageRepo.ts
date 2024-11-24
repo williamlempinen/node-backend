@@ -12,6 +12,7 @@ type MessageDataType = {
 
 const MessageRepo = {
   async createMessage(data: MessageDataType): Promise<RepoResponse<MessageDTO>> {
+    Logger.info(`GOT DATA ${JSON.stringify(data)}`)
     try {
       const isParticipant = await prisma.conversation.findFirst({
         where: {

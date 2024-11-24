@@ -1,6 +1,7 @@
 import { WebSocketServer } from 'ws'
 import Logger from '../core/Logger'
 import { verifyJwtToken } from '../auth/JWT'
+import { createMessage } from './chat/service'
 
 const wss = new WebSocketServer({ noServer: true })
 
@@ -8,7 +9,8 @@ wss.on('connection', (ws, request) => {
   Logger.info(`New WebSocket connection established, your request: ${request}`)
 
   ws.on('message', (message) => {
-    Logger.info(`Received message: ${message}`)
+    Logger.info(`Received message: ${message}, type of message: ${typeof message}`)
+    createMessage(message.toString())
     ws.send(`Echo: ${message}`)
   })
 
