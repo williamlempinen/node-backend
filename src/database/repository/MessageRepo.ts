@@ -42,9 +42,7 @@ const MessageRepo = {
       })
       if (!message) return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Could not create message' }]
 
-      const isConversationUpdated = await ConversationRepo.updateConversationUpdateFieldOnNewMessages(
-        data.conversationId
-      )
+      const isConversationUpdated = await ConversationRepo.updateConversationOnNewMessages(data.conversationId)
       if (!isConversationUpdated) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
 
       return [message, null]

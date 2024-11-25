@@ -145,7 +145,7 @@ const ConversationRepo = {
     }
   },
 
-  async updateConversationUpdateFieldOnNewMessages(conversationId: string): Promise<boolean> {
+  async updateConversationOnNewMessages(conversationId: string): Promise<boolean> {
     try {
       const updateSuccess = await prisma.conversation.update({
         where: {

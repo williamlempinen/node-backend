@@ -2,8 +2,6 @@ import { WebSocketServer, WebSocket } from 'ws'
 import Logger from '../core/Logger'
 import { verifyJwtToken } from '../auth/JWT'
 import { createMessage } from './chat/service'
-import { validator } from './validator'
-import Message from '../routes/message/schema'
 import { handleWebSocketError, WebSocketError } from './errors'
 import { WebSocketSuccessResponse } from './responses'
 
@@ -13,12 +11,9 @@ wss.on('connection', (ws: WebSocket, request) => {
   Logger.info(`New WebSocket connection established, your request: ${request}`)
 
   ws.on('message', async (message) => {
-    Logger.info(`Raw message received: ${message}`)
-    Logger.info(`Raw stringifyed message received: ${JSON.stringify(message)}`)
-    ws.send(`Echo: ${message}`)
     const { success, error } = await createMessage(message)
+
     if (error) {
-      Logger.error(`WS got error`)
       handleWebSocketError(ws, WebSocketError.MESSAGE_ERROR, 'Internal server error')
     }
 
@@ -33,7 +28,7 @@ wss.on('connection', (ws: WebSocket, request) => {
 
   ws.on('error', (error) => {
     Logger.error(`WebSocket error: ${error.message}`)
-    ws.send(`Echo: ${error}`)
+    handleWebSocketError(ws, WebSocketError.CONNECTION_ERROR, 'Internal server error')
   })
 })
 
@@ -50,6 +45,7 @@ export const handleWebSocketUpgrade = (request: any, socket: any, head: any) => 
     })
   } else {
     Logger.error('Invalid token, closing connection')
+
     socket.destroy()
   }
 }
