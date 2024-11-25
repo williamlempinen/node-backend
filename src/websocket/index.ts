@@ -1,17 +1,30 @@
-import { WebSocketServer } from 'ws'
+import { WebSocketServer, WebSocket } from 'ws'
 import Logger from '../core/Logger'
 import { verifyJwtToken } from '../auth/JWT'
 import { createMessage } from './chat/service'
+import { validator } from './validator'
+import Message from '../routes/message/schema'
+import { handleWebSocketError, WebSocketError } from './errors'
+import { WebSocketSuccessResponse } from './responses'
 
 const wss = new WebSocketServer({ noServer: true })
 
-wss.on('connection', (ws, request) => {
+wss.on('connection', (ws: WebSocket, request) => {
   Logger.info(`New WebSocket connection established, your request: ${request}`)
 
-  ws.on('message', (message) => {
-    Logger.info(`Received message: ${message}, type of message: ${typeof message}`)
-    createMessage(message.toString())
+  ws.on('message', async (message) => {
+    Logger.info(`Raw message received: ${message}`)
+    Logger.info(`Raw stringifyed message received: ${JSON.stringify(message)}`)
     ws.send(`Echo: ${message}`)
+    const { success, error } = await createMessage(message)
+    if (error) {
+      Logger.error(`WS got error`)
+      handleWebSocketError(ws, WebSocketError.MESSAGE_ERROR, 'Internal server error')
+    }
+
+    if (success !== null) {
+      ws.send(WebSocketSuccessResponse('Message sent successfully', success))
+    }
   })
 
   ws.on('close', () => {

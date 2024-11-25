@@ -143,6 +143,24 @@ const ConversationRepo = {
       Logger.error(`Error finding conversations: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
+  },
+
+  async updateConversationUpdateFieldOnNewMessages(conversationId: string): Promise<boolean> {
+    try {
+      const updateSuccess = await prisma.conversation.update({
+        where: {
+          id: parseInt(conversationId)
+        },
+        data: {
+          updated_at: new Date()
+        }
+      })
+      if (!updateSuccess) return false
+      return true
+    } catch (error: any) {
+      Logger.error(`Error updating conversation updated_at field: ${error}`)
+      return false
+    }
   }
 }
 

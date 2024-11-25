@@ -3,6 +3,7 @@ import Logger from '../../core/Logger'
 import { ErrorType } from '../../core/errors'
 import { prismaClient as prisma } from '..'
 import { MessageDTO } from '../models/MessageDTO'
+import ConversationRepo from './ConversationRepo'
 
 type MessageDataType = {
   content: string
@@ -40,6 +41,11 @@ const MessageRepo = {
         }
       })
       if (!message) return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Could not create message' }]
+
+      const isConversationUpdated = await ConversationRepo.updateConversationUpdateFieldOnNewMessages(
+        data.conversationId
+      )
+      if (!isConversationUpdated) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
 
       return [message, null]
     } catch (error: any) {
