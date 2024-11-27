@@ -1,8 +1,12 @@
-import Logger from '../../core/Logger'
-import MessageRepo from '../../database/repository/MessageRepo'
-import { validator } from '../validator'
-import Message from '../../routes/message/schema'
+import Logger from '../core/Logger'
+import MessageRepo from '../database/repository/MessageRepo'
+import { validator } from './validator'
+import Message from '../routes/message/schema'
+import { WebSocket } from 'ws'
+import { WebSocketClient } from 'types'
 
+// this is same type used in routes/message/createMessage.ts
+// where Zod is used instead of type
 type MessageDataType = {
   content: string
   senderId: string
@@ -10,7 +14,7 @@ type MessageDataType = {
 }
 
 type WebSocketResponse = {
-  success: any | null
+  data: any | null
   error: boolean
 }
 
@@ -18,10 +22,8 @@ export const createMessage = async (message: any): Promise<WebSocketResponse> =>
   try {
     const { isValid, data, error } = validator(Message.full, JSON.parse(message))
     if (!isValid || error) {
-      return { success: null, error: true }
+      return { data: null, error: true }
     }
-
-    Logger.info(`VALIDATED DATA ${data}`)
 
     const newMessage: MessageDataType = {
       content: data.content,
@@ -31,12 +33,17 @@ export const createMessage = async (message: any): Promise<WebSocketResponse> =>
 
     const [messageCreated, messageCreatedError] = await MessageRepo.createMessage(newMessage)
     if (messageCreatedError) {
-      return { success: null, error: true }
+      return { data: null, error: true }
     }
 
-    return { success: messageCreated, error: false }
+    return { data: messageCreated, error: false }
   } catch (error: any) {
     Logger.error(`Error in creating message from websocket input`)
-    return { success: null, error: true }
+    return { data: null, error: true }
   }
+}
+
+export const createConnectionType = (webSocket: WebSocket): WebSocketClient => {
+  const rnd = Math.random().toString(36).substr(2, 9)
+  return { ws: webSocket, id: rnd }
 }

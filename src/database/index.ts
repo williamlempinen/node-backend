@@ -33,9 +33,9 @@ export const connectToDatabase = async () => {
 }
 
 prismaClient.$on('query', (event: any) => {
-  Logger.verbose(`Query: ${event.query}`)
-  Logger.verbose(`Params: ${event.params}`)
-  Logger.verbose(`Duration: ${event.duration}ms`)
+  //Logger.verbose(`Query: ${event.query}`)
+  //Logger.verbose(`Params: ${event.params}`)
+  //Logger.verbose(`Duration: ${event.duration}ms`)
 })
 
 prismaClient.$on('warn', (event) => {

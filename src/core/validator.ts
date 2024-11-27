@@ -13,7 +13,7 @@ export enum ValidationSource {
 export const validator = (schema: ZodSchema<any>, source: ValidationSource = ValidationSource.BODY, where?: string) => {
   return (request: Request, response: Response, next: NextFunction) => {
     try {
-      Logger.warn(`[validator try]: SOURCE: ${source}, PAYLOAD: ${JSON.stringify(request[source])}`)
+      //Logger.warn(`[validator try]: SOURCE: ${source}, PAYLOAD: ${JSON.stringify(request[source])}`)
       {
         where && Logger.info(`FROM WHERE: ${where}`)
       }

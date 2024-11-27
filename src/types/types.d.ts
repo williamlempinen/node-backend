@@ -1,4 +1,5 @@
 import { ErrorType } from '../core/errors'
+import { WebSocket } from 'ws'
 
 type RequestError = {
   type: ErrorType
@@ -21,4 +22,9 @@ export type PaginatedSearchQuery = {
   searchQuery?: string
   page?: number
   limit?: number
+}
+
+export type WebSocketClient = {
+  ws: WebSocket
+  id: string
 }

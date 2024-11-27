@@ -1,51 +1,76 @@
 import { WebSocketServer, WebSocket } from 'ws'
+import { IncomingMessage } from 'http'
 import Logger from '../core/Logger'
 import { verifyJwtToken } from '../auth/JWT'
-import { createMessage } from './chat/service'
+import { createConnectionType, createMessage } from './service'
 import { handleWebSocketError, WebSocketError } from './errors'
 import { WebSocketSuccessResponse } from './responses'
+import { Socket } from 'net'
+import ConnectionManager from './manager'
 
 const wss = new WebSocketServer({ noServer: true })
 
-wss.on('connection', (ws: WebSocket, request) => {
-  Logger.info(`New WebSocket connection established, your request: ${request}`)
+wss.on('connection', (ws: WebSocket, request: IncomingMessage, conversationId: string) => {
+  const { addConnection, sendMessage, removeConnection } = ConnectionManager
 
+  const client = createConnectionType(ws)
+
+  addConnection(conversationId, client)
+
+  // ---------------------------- MESSAGES -------------------------------
   ws.on('message', async (message) => {
-    const { success, error } = await createMessage(message)
+    const { data, error } = await createMessage(message)
 
     if (error) {
       handleWebSocketError(ws, WebSocketError.MESSAGE_ERROR, 'Internal server error')
     }
 
-    if (success !== null) {
-      ws.send(WebSocketSuccessResponse('Message sent successfully', success))
+    if (data !== null) {
+      sendMessage(conversationId, WebSocketSuccessResponse('New message', data), client.id)
     }
   })
 
+  // ----------------------------- CLOSING -------------------------------
   ws.on('close', () => {
-    Logger.info('WebSocket connection closed')
+    // DEBUG
+    Logger.info(`Connection closing for conversation ID: ${conversationId} and client: ${client.id}`)
+    removeConnection(conversationId, client.id)
+    Logger.info(`Connection closed for conversation ID: ${conversationId} and client: ${client.id}`)
   })
 
+  // ----------------------------- ERRORS -------------------------------
   ws.on('error', (error) => {
     Logger.error(`WebSocket error: ${error.message}`)
+    removeConnection(conversationId, client.id)
     handleWebSocketError(ws, WebSocketError.CONNECTION_ERROR, 'Internal server error')
   })
 })
 
-export const handleWebSocketUpgrade = (request: any, socket: any, head: any) => {
-  const token = new URLSearchParams(request.url.split('?')[1]).get('token')
-  Logger.warn(`Upgrade, token: ${token}`)
+export const handleWebSocketUpgrade = (request: IncomingMessage, socket: Socket, head: Buffer) => {
+  try {
+    const searchParams = new URLSearchParams(request.url?.split('?')[1])
 
-  if (token && verifyJwtToken(token)) {
+    const token = searchParams.get('token')
+    const conversationId = searchParams.get('conversation-id')
+
+    if (!conversationId) {
+      Logger.error('REQUEST IS MISSING CONVERSATION ID')
+      socket.destroy()
+      return
+    }
+
+    if (!token || !verifyJwtToken(token)) {
+      Logger.error('Invalid token, closing connection')
+      socket.destroy()
+      return
+    }
+
     wss.handleUpgrade(request, socket, head, (ws) => {
       Logger.info('WebSocket upgrade successful')
-      ws.send('Welcome to the WebSocket server!')
-      ws.send(`HEAD: ${JSON.stringify(head)}`)
-      wss.emit('connection', ws, request)
+      wss.emit('connection', ws, request, conversationId)
     })
-  } else {
-    Logger.error('Invalid token, closing connection')
-
+  } catch (error: any) {
+    Logger.error('Error upgrading connection: ', error)
     socket.destroy()
   }
 }
