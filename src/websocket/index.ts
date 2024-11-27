@@ -21,13 +21,9 @@ wss.on('connection', (ws: WebSocket, request: IncomingMessage, conversationId: s
   ws.on('message', async (message) => {
     const { data, error } = await createMessage(message)
 
-    if (error) {
-      handleWebSocketError(ws, WebSocketError.MESSAGE_ERROR, 'Internal server error')
-    }
+    if (error) handleWebSocketError(ws, WebSocketError.MESSAGE_ERROR, 'Internal server error')
 
-    if (data !== null) {
-      sendMessage(conversationId, WebSocketSuccessResponse('New message', data), client.id)
-    }
+    if (data !== null) sendMessage(conversationId, WebSocketSuccessResponse('New message', data), client.id)
   })
 
   // ----------------------------- CLOSING -------------------------------

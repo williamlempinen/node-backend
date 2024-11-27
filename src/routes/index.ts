@@ -70,6 +70,8 @@ rootRouter.use('/contact', createContact)
 // -----------------------------------------------
 
 // ----------------- MESSAGE ---------------------
+
+// ********** this is not used -> messages created with ws *********
 rootRouter.use('/message', createMessage)
 rootRouter.use('/message', getMessages)
 // -----------------------------------------------
