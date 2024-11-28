@@ -84,7 +84,7 @@ const ConversationRepo = {
 
   async getConversations(
     userId: number,
-    { page = 1, limit = 10 }: PaginatedSearchQuery
+    { page = 1, limit = 20 }: PaginatedSearchQuery
   ): Promise<RepoResponse<Paginated<ConversationDTO>>> {
     try {
       const skip = (page - 1) * limit

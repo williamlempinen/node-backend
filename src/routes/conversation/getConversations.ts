@@ -6,7 +6,7 @@ import Logger from '../../core/Logger'
 import authenticate from '../../auth/authenticate'
 import ConversationRepo from '../../database/repository/ConversationRepo'
 import { SuccessResponse } from '../../core/responses'
-import { HOUR } from '../globals'
+import { HOUR_STR } from '../../constants'
 
 const router = express.Router()
 
@@ -24,11 +24,11 @@ router.get(
 
     const [conversationsPage, error] = await ConversationRepo.getConversations(parseInt(userId), {
       page: page,
-      limit: 10
+      limit: 20
     })
     if (error) return next({ type: error.type, message: error.errorMessage })
 
-    const res = response.append('Cache-Control', HOUR)
+    const res = response.append('Cache-Control', HOUR_STR)
 
     return SuccessResponse('Conversations found', res, conversationsPage)
   })

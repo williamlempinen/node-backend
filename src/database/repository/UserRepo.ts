@@ -8,6 +8,7 @@ import { Paginated, PaginatedSearchQuery, RepoResponse } from 'types'
 import { ErrorType } from '../../core/errors'
 import RefreshTokenRepo from './RefreshTokenRepo'
 import { redisGet, redisSet } from '../../cache/repository'
+import { HOUR_NUM } from '../../constants'
 
 const UserRepo = {
   // USE ONLY IN THIS SCOPE
@@ -112,7 +113,7 @@ const UserRepo = {
         return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not update user status' }]
       }
 
-      await redisSet(sessionId, JSON.stringify({ accessToken, refreshToken }), 3600) // expires in 1h
+      await redisSet(sessionId, JSON.stringify({ accessToken, refreshToken }), HOUR_NUM)
 
       return [{ user: userDTO, accessToken, refreshToken, sessionId }, null]
     } catch (error: any) {
@@ -193,8 +194,8 @@ const UserRepo = {
       })
 
       if (!users || !totalCount) {
-        Logger.error('Error finding users')
-        return [null, { type: ErrorType.INTERNAL, errorMessage: 'Error finding users' }]
+        Logger.error('No users found')
+        return [{ data: [], page: 1, limit: 10, totalCount: 0, totalPages: 0, hasNextPage: false }, null]
       }
 
       const userDTOs: UserDTO[] = users.map((user) => UserRepo.userToDTO(user)).filter((userDTO) => userDTO !== null)
