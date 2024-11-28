@@ -121,9 +121,26 @@ const UserRepo = {
     }
   },
 
-  // TODO
-  async logout(): Promise<boolean> {
-    return true
+  // this is not used
+  async logout(userId: number): Promise<RepoResponse<boolean>> {
+    try {
+      Logger.info('LOGGING USER OUT')
+      const userLogout = await prisma.user.update({
+        where: {
+          id: userId,
+          is_active: true
+        },
+        data: {
+          is_active: false
+        }
+      })
+      if (!userLogout) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+
+      return [true, null]
+    } catch (error: any) {
+      Logger.error(`Error logout on user`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
   },
 
   async updateUserIsActive(userId: number, isActive: boolean): Promise<boolean | null> {

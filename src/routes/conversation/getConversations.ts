@@ -6,6 +6,7 @@ import Logger from '../../core/Logger'
 import authenticate from '../../auth/authenticate'
 import ConversationRepo from '../../database/repository/ConversationRepo'
 import { SuccessResponse } from '../../core/responses'
+import { HOUR } from '../globals'
 
 const router = express.Router()
 
@@ -27,7 +28,9 @@ router.get(
     })
     if (error) return next({ type: error.type, message: error.errorMessage })
 
-    return SuccessResponse('Conversations found', response, conversationsPage)
+    const res = response.append('Cache-Control', HOUR)
+
+    return SuccessResponse('Conversations found', res, conversationsPage)
   })
 )
 

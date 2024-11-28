@@ -9,7 +9,7 @@ import authenticate from '../../auth/authenticate'
 
 const router = express.Router()
 
-//router.use('/', authenticate)
+router.use('/', authenticate)
 
 router.post(
   '/create-conversation',

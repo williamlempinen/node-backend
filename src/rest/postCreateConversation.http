@@ -3,6 +3,6 @@ Content-Type: application/json
 
 {
   "isGroup": true,
-  "groupName": "Joku jonne on kingi",
-  "participants": ["2","6","7", "1", "3", "8"]
+  "groupName": "William ja häne kamut",
+  "participants": ["2", "7", "9"]
 }

@@ -15,7 +15,7 @@ router.post(
   '/update-messages',
   validator(Conversation.updateMessagesAsSeen),
   asyncHandler(async (request, response, next) => {
-    Logger.info('Updating messages is seen')
+    Logger.info('Updating messages as seen')
 
     const { conversationId } = request.body
 

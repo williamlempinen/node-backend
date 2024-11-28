@@ -6,6 +6,7 @@ import Logger from '../../core/Logger'
 import Message from './schema'
 import MessageRepo from '../../database/repository/MessageRepo'
 import { SuccessResponse } from '../../core/responses'
+import { HOUR } from '../globals'
 
 const router = express.Router()
 
@@ -29,7 +30,9 @@ router.get(
     const [getMessagesPage, error] = await MessageRepo.getMessages(_conversationId, { page: _pageNumber, limit: 30 })
     if (error) return next({ type: error.type, message: error.errorMessage })
 
-    return SuccessResponse('Messages fetched', response, getMessagesPage)
+    const res = response.append('Cache-Control', HOUR)
+
+    return SuccessResponse('Messages fetched', res, getMessagesPage)
   })
 )
 

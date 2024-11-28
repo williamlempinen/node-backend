@@ -122,7 +122,8 @@ const ConversationRepo = {
             select: {
               id: true,
               username: true,
-              profile_picture_url: true
+              profile_picture_url: true,
+              is_active: true
             }
           }
         }
