@@ -18,6 +18,7 @@ import searchUsers from './users/searchUsers'
 
 import createConversation from './conversation/createConversation'
 import getConversations from './conversation/getConversations'
+import updateConversationMessagesAsSeen from './conversation/updateConversationMessagesAsSeen'
 
 import createContact from './contact/createContact'
 
@@ -63,6 +64,7 @@ rootRouter.use('/users', searchUsers)
 // --------------- CONVERSATION ------------------
 rootRouter.use('/conversation', createConversation)
 rootRouter.use('/conversation', getConversations)
+rootRouter.use('/conversation', updateConversationMessagesAsSeen)
 // -----------------------------------------------
 
 // ----------------- CONTACT ---------------------

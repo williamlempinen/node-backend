@@ -43,6 +43,9 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
+// is_seen should be unique for every user
+// current setup will mark message to be seen even though 
+// other users have not seen the message
 model Message {
   id              Int      @id @default(autoincrement())
   content         String   @db.VarChar(300)

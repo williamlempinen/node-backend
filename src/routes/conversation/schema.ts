@@ -9,6 +9,9 @@ const Conversation = {
   getConversation: z.object({
     userId: z.string().min(1),
     pageNumber: z.string().min(1).optional()
+  }),
+  updateMessagesAsSeen: z.object({
+    conversationId: z.string().min(1)
   })
 }
 

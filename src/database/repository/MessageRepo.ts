@@ -4,6 +4,8 @@ import { ErrorType } from '../../core/errors'
 import { prismaClient as prisma } from '..'
 import { MessageDTO } from '../models/MessageDTO'
 import ConversationRepo from './ConversationRepo'
+import { Primitive } from 'zod'
+import { type } from 'os'
 
 type MessageDataType = {
   content: string
@@ -42,8 +44,8 @@ const MessageRepo = {
       })
       if (!message) return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Could not create message' }]
 
-      const isConversationUpdated = await ConversationRepo.updateConversationOnNewMessages(data.conversationId)
-      if (!isConversationUpdated) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+      const [isConversationUpdated, error] = await ConversationRepo.updateConversationOnNewMessages(data.conversationId)
+      if (error) return [null, { type: error.type, errorMessage: error.errorMessage }]
 
       return [message, null]
     } catch (error: any) {

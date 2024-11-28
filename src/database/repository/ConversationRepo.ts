@@ -145,7 +145,7 @@ const ConversationRepo = {
     }
   },
 
-  async updateConversationOnNewMessages(conversationId: string): Promise<boolean> {
+  async updateConversationOnNewMessages(conversationId: string): Promise<RepoResponse<boolean>> {
     try {
       const updateSuccess = await prisma.conversation.update({
         where: {
@@ -155,11 +155,42 @@ const ConversationRepo = {
           updated_at: new Date()
         }
       })
-      if (!updateSuccess) return false
-      return true
+      if (!updateSuccess)
+        return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Bad request for updating conversation' }]
+
+      return [true, null]
     } catch (error: any) {
       Logger.error(`Error updating conversation updated_at field: ${error}`)
-      return false
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
+  },
+
+  async updateMessagesAsSeen(conversationId: string): Promise<RepoResponse<boolean>> {
+    try {
+      const updateSuccess = await prisma.conversation.update({
+        where: {
+          id: parseInt(conversationId)
+        },
+        data: {
+          messages: {
+            updateMany: {
+              where: {
+                is_seen: false
+              },
+              data: {
+                is_seen: true
+              }
+            }
+          }
+        }
+      })
+      if (!updateSuccess)
+        return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Bad request updating messages as seen' }]
+
+      return [true, null]
+    } catch (error: any) {
+      Logger.error(`Error occurred when updating message is_seen state: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   }
 }
