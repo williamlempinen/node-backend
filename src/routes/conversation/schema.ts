@@ -14,7 +14,8 @@ const Conversation = {
     pageNumber: z.string().min(1).optional()
   }),
   updateMessagesAsSeen: z.object({
-    conversationId: z.string().min(1)
+    conversationId: z.string().min(1),
+    userId: z.string().min(1)
   }),
   getConversationId: z.object({
     oneId: z.string().min(1),

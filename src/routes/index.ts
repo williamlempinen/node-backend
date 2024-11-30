@@ -23,6 +23,7 @@ import getConversationId from './conversation/getConversationId'
 import getConversation from './conversation/getConversation'
 
 import createContact from './contact/createContact'
+import deleteContact from './contact/deleteContact'
 
 import createMessage from './message/createMessage'
 import getMessages from './message/getMessages'
@@ -68,6 +69,7 @@ rootRouter.use('/conversation', getConversation)
 
 // ----------------- CONTACT ---------------------
 rootRouter.use('/contact', createContact)
+rootRouter.use('/contact', deleteContact)
 // -----------------------------------------------
 
 // ----------------- MESSAGE ---------------------

@@ -5,8 +5,8 @@ import { prismaClient as prisma } from '..'
 import { ContactDTO } from '../models/ContactDTO'
 
 type ContactPairType = {
-  userId: number
-  contactId: number
+  userId: string
+  contactId: string
 }
 
 const ContactRepo = {
@@ -14,8 +14,8 @@ const ContactRepo = {
     try {
       const createdContact = await prisma.contact.create({
         data: {
-          user_id: data.userId,
-          contact_id: data.contactId
+          user_id: parseInt(data.userId),
+          contact_id: parseInt(data.contactId)
         }
       })
       if (!createdContact) return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Could not create contact' }]
@@ -34,8 +34,8 @@ const ContactRepo = {
       const isContactDeleted = await prisma.contact.delete({
         where: {
           user_id_contact_id: {
-            user_id: data.userId,
-            contact_id: data.contactId
+            user_id: parseInt(data.userId),
+            contact_id: parseInt(data.contactId)
           }
         }
       })
@@ -54,8 +54,8 @@ const ContactRepo = {
       const foundUser = await prisma.contact.findFirst({
         where: {
           OR: [
-            { user_id: data.userId, contact_id: data.contactId },
-            { user_id: data.contactId, contact_id: data.userId }
+            { user_id: parseInt(data.userId), contact_id: parseInt(data.contactId) },
+            { user_id: parseInt(data.contactId), contact_id: parseInt(data.userId) }
           ]
         }
       })

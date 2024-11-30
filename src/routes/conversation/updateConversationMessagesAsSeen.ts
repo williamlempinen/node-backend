@@ -17,9 +17,9 @@ router.post(
   asyncHandler(async (request, response, next) => {
     Logger.info('Updating messages as seen')
 
-    const { conversationId } = request.body
+    const { conversationId, userId } = request.body
 
-    const [isUpdated, error] = await ConversationRepo.updateMessagesAsSeen(parseInt(conversationId))
+    const [isUpdated, error] = await ConversationRepo.updateMessagesAsSeen(parseInt(conversationId), parseInt(userId))
     if (error) return next({ type: error.type, message: error.errorMessage })
 
     return SuccessResponse('Messages updated', response, isUpdated)

@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
 const Contact = {
-  createContact: z.object({
-    userId: z.number().min(1),
-    contactId: z.number().min(1)
+  pairContact: z.object({
+    userId: z.string().min(1),
+    contactId: z.string().min(1)
   })
 }
 

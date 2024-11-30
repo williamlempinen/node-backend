@@ -43,15 +43,13 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
-// is_seen should be unique for every user
-// current setup will mark message to be seen even though 
-// other users have not seen the message
 model Message {
   id              Int      @id @default(autoincrement())
   content         String   @db.VarChar(300)
   created_at      DateTime @default(now()) @db.Timestamp(6)
   sender_id       Int
   is_seen         Boolean  @default(false)
+  is_seen_by      Int[]    @default([])
   conversation_id Int
 
   conversation Conversation @relation("ConversationMessages", fields: [conversation_id], references: [id], onDelete: Cascade)
@@ -64,11 +62,12 @@ model Message {
 // should also have field indicating how many new messages there are
 // i.e. amoun of messages user has not read
 model Conversation {
-  id         Int      @id @default(autoincrement())
-  is_group   Boolean  @default(false)
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @updatedAt @db.Timestamp(6)
-  group_name String   @db.VarChar(300)
+  id           Int      @id @default(autoincrement())
+  is_group     Boolean  @default(false)
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  updated_at   DateTime @updatedAt @db.Timestamp(6)
+  group_name   String   @db.VarChar(300)
+  unread_count Int      @default(0)   
 
   messages     Message[] @relation("ConversationMessages")
   participants User[]    @relation("UserConversations")

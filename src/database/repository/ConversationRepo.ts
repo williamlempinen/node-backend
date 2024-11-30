@@ -212,7 +212,10 @@ const ConversationRepo = {
           id: parseInt(conversationId)
         },
         data: {
-          updated_at: new Date()
+          updated_at: new Date(),
+          unread_count: {
+            increment: 1
+          }
         }
       })
       if (!updateSuccess)
@@ -225,20 +228,27 @@ const ConversationRepo = {
     }
   },
 
-  async updateMessagesAsSeen(conversationId: number): Promise<RepoResponse<boolean>> {
+  async updateMessagesAsSeen(conversationId: number, userId: number): Promise<RepoResponse<boolean>> {
     try {
       const updateSuccess = await prisma.conversation.update({
         where: {
           id: conversationId
         },
         data: {
+          unread_count: 0,
           messages: {
             updateMany: {
               where: {
-                is_seen: false
+                NOT: {
+                  is_seen_by: {
+                    has: userId
+                  }
+                }
               },
               data: {
-                is_seen: true
+                is_seen_by: {
+                  push: userId
+                }
               }
             }
           }

@@ -28,9 +28,7 @@ router.get(
     })
     if (error) return next({ type: error.type, message: error.errorMessage })
 
-    const res = response.append('Cache-Control', HOUR_STR)
-
-    return SuccessResponse('Conversations found', res, conversationsPage)
+    return SuccessResponse('Conversations found', response, conversationsPage)
   })
 )
 

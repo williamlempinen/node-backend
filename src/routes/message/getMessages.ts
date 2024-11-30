@@ -30,9 +30,7 @@ router.get(
     const [getMessagesPage, error] = await MessageRepo.getMessages(_conversationId, { page: _pageNumber, limit: 30 })
     if (error) return next({ type: error.type, message: error.errorMessage })
 
-    const res = response.append('Cache-Control', HOUR_STR)
-
-    return SuccessResponse('Messages fetched', res, getMessagesPage)
+    return SuccessResponse('Messages fetched', response, getMessagesPage)
   })
 )
 

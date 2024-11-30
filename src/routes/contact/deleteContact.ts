@@ -11,17 +11,13 @@ const router = express.Router()
 router.use('/', authenticate)
 
 router.post(
-  '/create-contact',
+  '/delete-contact',
   validator(Contact.pairContact),
   asyncHandler(async (request, response, next) => {
-    const [isAlreadyContacts, error] = await ContactRepo.isUserContact(request.body)
+    const [deleteUserFromContacts, error] = await ContactRepo.deleteContact(request.body)
     if (error) return next({ type: error.type, message: error.errorMessage })
-    if (isAlreadyContacts) return SuccessResponse('User is already in your contacts', response, isAlreadyContacts)
 
-    const [addUserToContacts, errorAdding] = await ContactRepo.createContact(request.body)
-    if (errorAdding) return next({ type: errorAdding.type, message: errorAdding.errorMessage })
-
-    return SuccessResponse('User added to your contacts', response, addUserToContacts)
+    return SuccessResponse('User added to your contacts', response, deleteUserFromContacts)
   })
 )
 
