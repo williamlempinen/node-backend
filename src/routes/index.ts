@@ -20,6 +20,7 @@ import createConversation from './conversation/createConversation'
 import getConversations from './conversation/getConversations'
 import updateConversationMessagesAsSeen from './conversation/updateConversationMessagesAsSeen'
 import getConversationId from './conversation/getConversationId'
+import getConversation from './conversation/getConversation'
 
 import createContact from './contact/createContact'
 
@@ -62,6 +63,7 @@ rootRouter.use('/conversation', createConversation)
 rootRouter.use('/conversation', getConversations)
 rootRouter.use('/conversation', updateConversationMessagesAsSeen)
 rootRouter.use('/conversation', getConversationId)
+rootRouter.use('/conversation', getConversation)
 // -----------------------------------------------
 
 // ----------------- CONTACT ---------------------

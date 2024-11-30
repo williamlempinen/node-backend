@@ -12,20 +12,17 @@ const router = express.Router()
 router.use('/', authenticate)
 
 router.get(
-  `/get-conversation-id/:oneId/:secId`,
-  validator(Conversation.getConversationId, ValidationSource.PARAMS),
+  `/get-conversation/:id`,
+  validator(Conversation.getConversation, ValidationSource.PARAMS),
   asyncHandler(async (request, response, next) => {
-    const { oneId, secId } = request.params
+    const { id } = request.params
 
-    Logger.info(`Get conversation id for ids: ${oneId} ${secId}`)
+    Logger.info(`Get conversation for id: ${id}`)
 
-    const [conversationId, noConversation] = await ConversationRepo.getPrivateConversationIdFromParticipantIds(
-      parseInt(oneId),
-      parseInt(secId)
-    )
-    if (noConversation) return SuccessResponse('No conversation', response)
+    const [conversation, error] = await ConversationRepo.getConversation(parseInt(id))
+    if (error) return next({ type: error.type, errorMessage: error.errorMessage })
 
-    return SuccessResponse('Conversation id found', response, conversationId)
+    return SuccessResponse('Conversation id found', response, conversation)
   })
 )
 

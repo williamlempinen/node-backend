@@ -14,7 +14,7 @@ router.use('/', authenticate)
 
 router.get(
   `/get-conversations/:userId/:pageNumber`,
-  validator(Conversation.getConversation, ValidationSource.PARAMS),
+  validator(Conversation.getConversations, ValidationSource.PARAMS),
   asyncHandler(async (request, response, next) => {
     const { userId, pageNumber } = request.params
 

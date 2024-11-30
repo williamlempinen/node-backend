@@ -1,6 +1,5 @@
 import { Paginated, PaginatedSearchQuery, RepoResponse } from 'types'
 import { prismaClient as prisma } from '..'
-import { Conversation, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { ErrorType } from '../../core/errors'
 import { ConversationDTO } from '../models/ConversationDTO'
@@ -51,11 +50,27 @@ const ConversationRepo = {
       const createdConversation = await prisma.conversation.create({
         data: {
           is_group: data.isGroup ?? false,
-          group_name: data.groupName ?? groupName,
+          group_name: data.isGroup && data.groupName ? data.groupName : groupName,
           participants: {
             connect: data.participants.map((pId) => ({
               id: parseInt(pId)
             }))
+          }
+        },
+        include: {
+          messages: {
+            take: 30,
+            orderBy: {
+              created_at: 'desc'
+            }
+          },
+          participants: {
+            select: {
+              id: true,
+              username: true,
+              profile_picture_url: true,
+              is_active: true
+            }
           }
         }
       })
@@ -84,6 +99,44 @@ const ConversationRepo = {
       return [true, null]
     } catch (error: any) {
       Logger.error(`Error deleting conversation: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
+  },
+
+  async getConversation(id: number): Promise<RepoResponse<ConversationDTO>> {
+    try {
+      const conversation = await prisma.conversation.findFirst({
+        where: {
+          id: id
+        },
+        include: {
+          messages: {
+            take: 30,
+            orderBy: {
+              created_at: 'desc'
+            }
+          },
+          participants: {
+            select: {
+              id: true,
+              username: true,
+              profile_picture_url: true,
+              is_active: true
+            }
+          }
+        }
+      })
+      if (!conversation) return [null, { type: ErrorType.NOT_FOUND, errorMessage: 'No conversations found' }]
+
+      Logger.info('DATA: ', conversation.group_name)
+
+      if (conversation === undefined) {
+        Logger.info('UNDEFINED')
+      }
+
+      return [conversation, null]
+    } catch (error: any) {
+      Logger.error(`Error getting conversation: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   },
@@ -172,11 +225,11 @@ const ConversationRepo = {
     }
   },
 
-  async updateMessagesAsSeen(conversationId: string): Promise<RepoResponse<boolean>> {
+  async updateMessagesAsSeen(conversationId: number): Promise<RepoResponse<boolean>> {
     try {
       const updateSuccess = await prisma.conversation.update({
         where: {
-          id: parseInt(conversationId)
+          id: conversationId
         },
         data: {
           messages: {

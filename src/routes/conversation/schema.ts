@@ -4,9 +4,12 @@ const Conversation = {
   createConversation: z.object({
     isGroup: z.boolean().optional().default(false),
     participants: z.array(z.string().min(1)),
-    groupName: z.string().min(1).optional()
+    groupName: z.string().optional()
   }),
   getConversation: z.object({
+    id: z.string().min(1)
+  }),
+  getConversations: z.object({
     userId: z.string().min(1),
     pageNumber: z.string().min(1).optional()
   }),

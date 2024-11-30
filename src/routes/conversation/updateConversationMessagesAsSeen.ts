@@ -19,7 +19,7 @@ router.post(
 
     const { conversationId } = request.body
 
-    const [isUpdated, error] = await ConversationRepo.updateMessagesAsSeen(conversationId)
+    const [isUpdated, error] = await ConversationRepo.updateMessagesAsSeen(parseInt(conversationId))
     if (error) return next({ type: error.type, message: error.errorMessage })
 
     return SuccessResponse('Messages updated', response, isUpdated)
