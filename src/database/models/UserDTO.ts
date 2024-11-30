@@ -1,3 +1,3 @@
-import { User } from '@prisma/client'
+import { User, Contact } from '@prisma/client'
 
-export type UserDTO = Omit<User, 'password' | 'updated_at'>
+export type UserDTO = Omit<User, 'password' | 'updated_at'> & { contacts: Contact[] }

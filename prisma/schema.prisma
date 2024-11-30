@@ -76,6 +76,8 @@ model Conversation {
   @@map("conversations")
 }
 
+
+// contacts could have username and a profile picture
 model Contact {
   id         Int      @id @default(autoincrement())
   user_id    Int

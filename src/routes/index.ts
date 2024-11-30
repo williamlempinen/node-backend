@@ -19,6 +19,7 @@ import searchUsers from './users/searchUsers'
 import createConversation from './conversation/createConversation'
 import getConversations from './conversation/getConversations'
 import updateConversationMessagesAsSeen from './conversation/updateConversationMessagesAsSeen'
+import getConversationId from './conversation/getConversationId'
 
 import createContact from './contact/createContact'
 
@@ -40,11 +41,6 @@ rootRouter.get('/', async (request: Request, response: Response) => {
 // -----------------------------------------------
 
 // ------------------ ACCESS ---------------------
-rootRouter.get('/access', async (request: Request, response: Response) => {
-  const users = await UserRepo.findAll()
-  response.send(`All created users: ${JSON.stringify(users)}`)
-})
-
 rootRouter.use('/access', signup)
 rootRouter.use('/access', login)
 rootRouter.use('/access', logout)
@@ -65,6 +61,7 @@ rootRouter.use('/users', searchUsers)
 rootRouter.use('/conversation', createConversation)
 rootRouter.use('/conversation', getConversations)
 rootRouter.use('/conversation', updateConversationMessagesAsSeen)
+rootRouter.use('/conversation', getConversationId)
 // -----------------------------------------------
 
 // ----------------- CONTACT ---------------------

@@ -25,6 +25,7 @@ wss.on('connection', (ws: WebSocket, request: IncomingMessage, conversationId: s
 
     if (data !== null) sendMessage(conversationId, WebSocketSuccessResponse('New message', data), client.id)
   })
+  // ---------------------------------------------------------------------
 
   // ----------------------------- CLOSING -------------------------------
   ws.on('close', () => {
@@ -33,6 +34,7 @@ wss.on('connection', (ws: WebSocket, request: IncomingMessage, conversationId: s
     removeConnection(conversationId, client.id)
     Logger.info(`Connection closed for conversation ID: ${conversationId} and client: ${client.id}`)
   })
+  // --------------------------------------------------------------------
 
   // ----------------------------- ERRORS -------------------------------
   ws.on('error', (error) => {
@@ -40,6 +42,7 @@ wss.on('connection', (ws: WebSocket, request: IncomingMessage, conversationId: s
     removeConnection(conversationId, client.id)
     handleWebSocketError(ws, WebSocketError.CONNECTION_ERROR, 'Internal server error')
   })
+  // --------------------------------------------------------------------
 })
 
 export const handleWebSocketUpgrade = (request: IncomingMessage, socket: Socket, head: Buffer) => {

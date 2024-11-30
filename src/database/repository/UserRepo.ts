@@ -1,5 +1,5 @@
 import { prismaClient as prisma } from '..'
-import { User, Prisma as P } from '@prisma/client'
+import { User, Prisma as P, Contact } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { UserDTO } from '../models/UserDTO'
 import { checkPasswordHash, createTokens, generateSessionId, hashPassword } from '../../auth/authUtils'
@@ -12,9 +12,9 @@ import { HOUR_NUM } from '../../constants'
 
 const UserRepo = {
   // USE ONLY IN THIS SCOPE
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<(User & { contacts: Contact[] }) | null> {
     try {
-      const user = await prisma.user.findFirst({ where: { email: email } })
+      const user = await prisma.user.findFirst({ where: { email: email }, include: { contacts: true } })
       if (!user) return null
 
       return user
@@ -26,10 +26,10 @@ const UserRepo = {
 
   async findById(id: number): Promise<RepoResponse<UserDTO>> {
     try {
-      const user = await prisma.user.findUnique({ where: { id: id } })
+      const user = await prisma.user.findUnique({ where: { id: id }, include: { contacts: true } })
       if (!user) return [null, { type: ErrorType.NOT_FOUND, errorMessage: `No user found with id: ${id}` }]
 
-      const userDTO = UserRepo.userToDTO(user)
+      const userDTO = UserRepo.userToDTO(user, user.contacts)
       return [userDTO, null]
     } catch (error: any) {
       Logger.error(`Error finding user by id: ${error}`)
@@ -37,17 +37,20 @@ const UserRepo = {
     }
   },
 
-  async findAll(): Promise<RepoResponse<UserDTO[]>> {
-    try {
-      const allUsers: User[] = await prisma.user.findMany()
-      const userDTOs: UserDTO[] = allUsers.map((user) => UserRepo.userToDTO(user)).filter((userDTO) => userDTO !== null)
-
-      return [{ ...userDTOs }, null]
-    } catch (error: any) {
-      Logger.error(`Error occured while finding all users: ${error}`)
-      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
-    }
-  },
+  // this is testing
+  //async findAll(): Promise<RepoResponse<UserDTO[]>> {
+  //  try {
+  //    const allUsers = await prisma.user.findMany({ include: { contacts: true } })
+  //    const userDTOs: UserDTO[] = allUsers
+  //      .map((user) => UserRepo.userToDTO(user, user.contact))
+  //      .filter((userDTO) => userDTO !== null)
+  //
+  //    return [[], null]
+  //  } catch (error: any) {
+  //    Logger.error(`Error occured while finding all users: ${error}`)
+  //    return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+  //  }
+  //},
 
   async registerUser(
     data: P.UserCreateInput
@@ -62,7 +65,7 @@ const UserRepo = {
       const user = await prisma.user.create({ data: { ...data, password: hashedPassword } })
       if (!user) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not create new user' }]
 
-      const userDTO = UserRepo.userToDTO(user)
+      const userDTO = UserRepo.userToDTO(user, [])
 
       const { accessToken, refreshToken } = await createTokens(userDTO)
       if (!accessToken || !refreshToken)
@@ -91,7 +94,7 @@ const UserRepo = {
         return [null, { type: ErrorType.UNAUTHORIZED, errorMessage: 'Password incorrect' }]
       }
 
-      const userDTO = UserRepo.userToDTO(user)
+      const userDTO = UserRepo.userToDTO(user, user.contacts)
 
       // DO NOT HANDLE THE ERROR
       const [existingRefreshToken, error] = await RefreshTokenRepo.findByUserId(userDTO.id)
@@ -161,11 +164,11 @@ const UserRepo = {
 
   async findAllActiveUsers(): Promise<RepoResponse<UserDTO[]>> {
     try {
-      const activeUsers = await prisma.user.findMany({ where: { is_active: true } })
+      const activeUsers = await prisma.user.findMany({ where: { is_active: true }, include: { contacts: true } })
       if (!activeUsers) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
 
       const userDTOs: UserDTO[] = activeUsers
-        .map((user) => UserRepo.userToDTO(user))
+        .map((user) => UserRepo.userToDTO(user, user.contacts))
         .filter((userDTO) => userDTO !== null)
 
       return [userDTOs, null]
@@ -198,7 +201,10 @@ const UserRepo = {
         return [{ data: [], page: 1, limit: 10, totalCount: 0, totalPages: 0, hasNextPage: false }, null]
       }
 
-      const userDTOs: UserDTO[] = users.map((user) => UserRepo.userToDTO(user)).filter((userDTO) => userDTO !== null)
+      // contacts are returned as an empty list
+      const userDTOs: UserDTO[] = users
+        .map((user) => UserRepo.userToDTO(user, []))
+        .filter((userDTO) => userDTO !== null)
 
       const totalPages = Math.ceil(totalCount / limit)
       const hasNextPage = page < totalPages
@@ -210,7 +216,7 @@ const UserRepo = {
     }
   },
 
-  userToDTO(data: User): UserDTO {
+  userToDTO(data: User, contacts: Contact[]): UserDTO {
     const userDTO: UserDTO = {
       id: data.id,
       username: data.username,
@@ -218,7 +224,8 @@ const UserRepo = {
       is_active: data.is_active,
       created_at: data.created_at,
       role: data.role,
-      profile_picture_url: data.profile_picture_url
+      profile_picture_url: data.profile_picture_url,
+      contacts: contacts || []
     }
 
     return userDTO

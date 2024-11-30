@@ -13,11 +13,6 @@ const router = express.Router()
 router.use(
   validator(Auth.authenticate, ValidationSource.HEADERS, 'authentication middleware'),
   asyncHandler(async (request, response, next) => {
-    Logger.info('ALL: ', request)
-    Logger.info('ALL: ', response)
-    Logger.info('HEADERS: ', request.headers)
-    Logger.info('RAW COOKIES: ', request.headers.cookie)
-
     const accessToken = getAccessToken(request.headers.authorization)
 
     if (!accessToken || accessToken.length === 0)

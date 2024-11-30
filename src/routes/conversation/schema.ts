@@ -12,6 +12,10 @@ const Conversation = {
   }),
   updateMessagesAsSeen: z.object({
     conversationId: z.string().min(1)
+  }),
+  getConversationId: z.object({
+    oneId: z.string().min(1),
+    secId: z.string().min(1)
   })
 }
 

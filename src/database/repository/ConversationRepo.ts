@@ -34,8 +34,14 @@ const ConversationRepo = {
         const [p1, e1] = await UserRepo.findById(parseInt(data.participants[0]))
         const [p2, e2] = await UserRepo.findById(parseInt(data.participants[1]))
 
-        if (e1 || e2)
+        if (e1 || e2 || !p1 || !p2)
           return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Cannot find users to create conversation' }]
+
+        const [privateConversationExists, notExists] =
+          await ConversationRepo.getPrivateConversationIdFromParticipantIds(p1.id, p2.id)
+
+        if (privateConversationExists)
+          return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Private conversation already exists' }]
 
         groupName = p1?.username + ' <> ' + p2?.username
       }
@@ -192,6 +198,35 @@ const ConversationRepo = {
     } catch (error: any) {
       Logger.error(`Error occurred when updating message is_seen state: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
+  },
+
+  async getPrivateConversationIdFromParticipantIds(oneId: number, secId: number): Promise<RepoResponse<number | null>> {
+    try {
+      const conversation = await prisma.conversation.findFirst({
+        where: {
+          is_group: false,
+          participants: {
+            every: { id: { in: [oneId, secId] } },
+            none: { id: { notIn: [oneId, secId] } }
+          }
+        },
+        select: {
+          id: true
+        }
+      })
+      // this is not error, there just does not exist a conversation
+      // between these users
+      if (!conversation) {
+        Logger.verbose('NO CONVERSATION')
+        return [null, { type: ErrorType.NOT_FOUND, errorMessage: 'No existing conversation' }]
+      }
+
+      Logger.verbose('CONVERSATION FOUND')
+      return [conversation.id, null]
+    } catch (error: any) {
+      Logger.error(`Error finding private conversation: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server  error' }]
     }
   }
 }

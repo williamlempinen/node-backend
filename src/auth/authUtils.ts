@@ -35,18 +35,55 @@ export const createTokens = async (userDTO: UserDTO): Promise<Tokens> => {
 export const deleteExpiredRefreshTokens = async () => {
   try {
     const now = new Date()
-    const result = await prisma.refreshToken.deleteMany({
+    Logger.info('Running checks')
+
+    const expiredTokens = await prisma.refreshToken.findMany({
       where: {
         expires_at: {
           lt: now
         }
+      },
+      select: {
+        user_id: true
       }
     })
 
-    Logger.info('Running checks')
+    if (expiredTokens.length === 0) {
+      Logger.info('No expired refresh tokens found.')
+      return
+    }
 
-    if (result.count > 0) {
-      Logger.info(`Deleted ${result.count} expired refresh tokens.`)
+    const userIds = Array.from(new Set(expiredTokens.map((token) => token.user_id)))
+
+    const inactiveUsersWithExpiredTokens = await prisma.user.findMany({
+      where: {
+        id: {
+          in: userIds
+        },
+        is_active: false
+      },
+      select: {
+        id: true
+      }
+    })
+
+    const inactiveUserIds = inactiveUsersWithExpiredTokens.map((user) => user.id)
+
+    if (inactiveUserIds.length === 0) {
+      Logger.info('No inactive users found with expired refresh tokens.')
+      return
+    }
+
+    const deleteResult = await prisma.refreshToken.deleteMany({
+      where: {
+        user_id: {
+          in: inactiveUserIds
+        }
+      }
+    })
+
+    if (deleteResult.count > 0) {
+      Logger.info(`Updated ${userIds.length} users' and deleted ${deleteResult.count} expired refresh tokens.`)
     }
   } catch (error: any) {
     Logger.error(`Failed to delete expired refresh tokens: ${error.message}`)

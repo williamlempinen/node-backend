@@ -3,6 +3,7 @@ import { RefreshToken, Prisma as P } from '@prisma/client'
 import Logger from '../../core/Logger'
 import { RepoResponse } from 'types'
 import { ErrorType } from '../../core/errors'
+import { HOUR_NUM } from '../../constants'
 
 const RefreshTokenRepo = {
   async create(userId: number, refreshToken: string): Promise<RepoResponse<RefreshToken>> {
@@ -26,7 +27,7 @@ const RefreshTokenRepo = {
         data: {
           user: { connect: { id: userId } },
           token_hash: refreshToken,
-          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000)
+          expires_at: new Date(Date.now() + HOUR_NUM)
         }
       })
       if (!token) return [null, { type: ErrorType.INTERNAL, errorMessage: 'Error creating new refresh token' }]
