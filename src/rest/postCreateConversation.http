@@ -3,6 +3,6 @@ Content-Type: application/json
 
 {
   "isGroup": false,
-  "groupName": "William ja tester test",
-  "participants": ["2", "9"]
+  "groupName": "William ja test",
+  "participants": ["1", "2"]
 }

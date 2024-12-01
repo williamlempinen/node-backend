@@ -7,9 +7,9 @@ type RequestError = {
   errorDetails?: any
 }
 
-export type RepoResponse<T> = Promise<[T | null, RequestError | null]>
+type RepoResponse<T> = Promise<[T | null, RequestError | null]>
 
-export type Paginated<T> = {
+type Paginated<T> = {
   data: T[]
   page: number
   limit: number
@@ -18,13 +18,13 @@ export type Paginated<T> = {
   hasNextPage: boolean
 }
 
-export type PaginatedSearchQuery = {
+type PaginatedSearchQuery = {
   searchQuery?: string
   page?: number
   limit?: number
 }
 
-export type WebSocketClient = {
+type WebSocketClient = {
   ws: WebSocket
   id: string
 }

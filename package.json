@@ -4,12 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node build/server.js",
     "dev": "nodemon --exec ts-node src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "format": "prettier --write .",
-    "prepare": "husky"
+    "format": "prettier --write ."
   },
   "author": "william lempinen",
   "license": "ISC",
@@ -23,7 +22,6 @@
     "@types/ws": "^8.5.12",
     "@typescript-eslint/eslint-plugin": "^8.2.0",
     "@typescript-eslint/parser": "^8.2.0",
-    "dotenv": "^16.4.5",
     "eslint": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
@@ -41,6 +39,7 @@
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",

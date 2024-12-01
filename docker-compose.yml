@@ -23,12 +23,14 @@ services:
       - redis-data:/data
 
   node-server:
-    image: tuplawee7/node-server:latest
+    build:
+      context: .
     container_name: node-server
     ports:
-      - 8000:8000
+      - '${PORT}:8000'
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules
     depends_on:
       - redis
       - postgres
@@ -39,10 +41,6 @@ services:
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
       REDIS_URL: ${REDIS_URL_REDIS}
       JWT_SECRET: ${JWT_SECRET}
-    command: >
-      sh -c "npx prisma migrate dev --name init &&
-             npx prisma generate &&
-             npm run dev"
 
 volumes:
   redis-data:
