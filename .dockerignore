@@ -4,4 +4,4 @@ build/
 .eslint*
 .prettier*
 *.md
-
+Dockerfile
