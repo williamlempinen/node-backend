@@ -16,6 +16,7 @@ import getConversations from './conversation/getConversations'
 import updateConversationMessagesAsSeen from './conversation/updateConversationMessagesAsSeen'
 import getConversationId from './conversation/getConversationId'
 import getConversation from './conversation/getConversation'
+import getGroupConversations from './conversation/getGroupConversations'
 
 import createContact from './contact/createContact'
 import deleteContact from './contact/deleteContact'
@@ -54,6 +55,7 @@ rootRouter.use('/conversation', getConversations)
 rootRouter.use('/conversation', updateConversationMessagesAsSeen)
 rootRouter.use('/conversation', getConversationId)
 rootRouter.use('/conversation', getConversation)
+rootRouter.use('/conversation', getGroupConversations)
 // -----------------------------------------------
 
 // ----------------- CONTACT ---------------------

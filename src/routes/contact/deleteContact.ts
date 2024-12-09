@@ -17,7 +17,7 @@ router.post(
     const [deleteUserFromContacts, error] = await ContactRepo.deleteContact(request.body)
     if (error) return next({ type: error.type, message: error.errorMessage })
 
-    return SuccessResponse('User added to your contacts', response, deleteUserFromContacts)
+    return SuccessResponse('User deleted from your contacts', response, deleteUserFromContacts)
   })
 )
 

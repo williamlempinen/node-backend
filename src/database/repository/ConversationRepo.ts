@@ -291,6 +291,29 @@ const ConversationRepo = {
       Logger.error(`Error finding private conversation: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server  error' }]
     }
+  },
+
+  async getGroupConversations(userId: string): Promise<RepoResponse<ConversationDTO[]>> {
+    try {
+      const id = parseInt(userId)
+
+      const groupConversations = await prisma.conversation.findMany({
+        where: {
+          is_group: true,
+          participants: {
+            some: { id: { in: [id] } }
+          }
+        }
+      })
+      if (!groupConversations)
+        return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Bad request for getting group conversations' }]
+
+      Logger.info('FOUND GROUP CONVERSATIONS')
+      return [groupConversations, null]
+    } catch (error: any) {
+      Logger.error(`Error finding group conversations: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server  error' }]
+    }
   }
 }
 

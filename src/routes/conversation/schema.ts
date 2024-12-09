@@ -20,6 +20,9 @@ const Conversation = {
   getConversationId: z.object({
     oneId: z.string().min(1),
     secId: z.string().min(1)
+  }),
+  getGroupConversations: z.object({
+    userId: z.string().min(1)
   })
 }
 

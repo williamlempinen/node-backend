@@ -4,8 +4,11 @@ import { validator } from './validator'
 import Message from '../routes/message/schema'
 import { WebSocket } from 'ws'
 import { WebSocketClient } from 'types'
+import ConversationRepo from '../database/repository/ConversationRepo'
+import UserRepo from '../database/repository/UserRepo'
 
-// this is same type used in routes/message/createMessage.ts
+// this is the same type used in
+// routes/message/createMessage.ts
 // where Zod is used instead of type
 type MessageDataType = {
   content: string
@@ -42,6 +45,35 @@ export const createMessage = async (message: any): Promise<WebSocketResponse> =>
     return { data: null, error: true }
   }
 }
+
+//todo
+export const updateIsSeen = async (message: any): Promise<WebSocketResponse> => {
+  try {
+    const { conversationId, id } = JSON.parse(message)
+    Logger.info(`Conversation id: ${conversationId} and user id: ${id}`)
+
+    const [isUserActive, errorUserActive] = await UserRepo.isUserActive(id)
+    if (errorUserActive) {
+      return { data: null, error: true }
+    }
+
+    const [updatedAsSeen, errorUpdateMessages] = await ConversationRepo.updateMessagesAsSeen(
+      parseInt(conversationId),
+      parseInt(id)
+    )
+    if (errorUpdateMessages) {
+      return { data: null, error: true }
+    }
+
+    return { data: updatedAsSeen, error: false }
+  } catch (error: any) {
+    Logger.error(`Error in updating messages as seen on new messages`)
+    return { data: null, error: true }
+  }
+}
+
+//todo
+export const updateIsPresent = async (something: any) => { }
 
 export const createConnectionType = (webSocket: WebSocket): WebSocketClient => {
   const rnd = Math.random().toString(36).substr(2, 9)

@@ -9,6 +9,7 @@ import { ErrorType } from '../../core/errors'
 import RefreshTokenRepo from './RefreshTokenRepo'
 import { redisGet, redisSet } from '../../cache/repository'
 import { HOUR_NUM } from '../../constants'
+import { type } from 'os'
 
 const UserRepo = {
   // USE ONLY IN THIS SCOPE
@@ -212,6 +213,25 @@ const UserRepo = {
       return [{ data: userDTOs, page, limit, totalCount, totalPages, hasNextPage }, null]
     } catch (error: any) {
       Logger.error(`Error searching users: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
+    }
+  },
+
+  async isUserActive(userId: number): Promise<RepoResponse<boolean>> {
+    try {
+      const isUserActive = await prisma.user.findFirst({
+        where: {
+          id: userId
+        },
+        select: {
+          is_active: true
+        }
+      })
+      if (!isUserActive) return [null, { type: ErrorType.NOT_FOUND, errorMessage: 'User not found ' }]
+
+      return [isUserActive.is_active, null]
+    } catch (error: any) {
+      Logger.error(`Error finding if user is active: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server error' }]
     }
   },
