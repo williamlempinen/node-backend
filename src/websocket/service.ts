@@ -73,7 +73,7 @@ export const updateIsSeen = async (message: any): Promise<WebSocketResponse> => 
 }
 
 //todo
-export const updateIsPresent = async (something: any) => { }
+export const updateIsPresent = async (something: any) => {}
 
 export const createConnectionType = (webSocket: WebSocket): WebSocketClient => {
   const rnd = Math.random().toString(36).substr(2, 9)

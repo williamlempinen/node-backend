@@ -11,4 +11,3 @@ Backend for the ZarChat application, made with React
 - cache
 - handling token refresh/auth
 - update schema to have list of users who have/have not seen a message
-- update docker to work as dev environment

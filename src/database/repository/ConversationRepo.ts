@@ -4,6 +4,9 @@ import Logger from '../../core/Logger'
 import { ErrorType } from '../../core/errors'
 import { ConversationDTO } from '../models/ConversationDTO'
 import UserRepo from './UserRepo'
+import { type } from 'os'
+import { error } from 'console'
+import errorMiddleware from '../../core/errorMiddleware'
 
 type CreateConversationType = {
   isGroup?: boolean
@@ -303,6 +306,22 @@ const ConversationRepo = {
           participants: {
             some: { id: { in: [id] } }
           }
+        },
+        include: {
+          messages: {
+            take: 30,
+            orderBy: {
+              created_at: 'desc'
+            }
+          },
+          participants: {
+            select: {
+              id: true,
+              username: true,
+              profile_picture_url: true,
+              is_active: true
+            }
+          }
         }
       })
       if (!groupConversations)
@@ -312,6 +331,37 @@ const ConversationRepo = {
       return [groupConversations, null]
     } catch (error: any) {
       Logger.error(`Error finding group conversations: ${error}`)
+      return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server  error' }]
+    }
+  },
+
+  async addUserToGroup(userId: string, conversationId: string): Promise<RepoResponse<boolean>> {
+    try {
+      const uId = parseInt(userId)
+      const cId = parseInt(conversationId)
+
+      const isUserAdded = await prisma.conversation.update({
+        where: {
+          is_group: true,
+          id: cId
+        },
+        data: {
+          participants: {
+            connect: {
+              id: uId
+            }
+          }
+        }
+      })
+      if (!isUserAdded)
+        return [
+          null,
+          { type: ErrorType.BAD_REQUEST, errorMessage: 'Bad request for adding user to a group conversation' }
+        ]
+
+      return [true, null]
+    } catch (error: any) {
+      Logger.error(`Error adding user to a group: ${error}`)
       return [null, { type: ErrorType.INTERNAL, errorMessage: 'Internal server  error' }]
     }
   }
