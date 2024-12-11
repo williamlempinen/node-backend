@@ -1,6 +1,22 @@
 import { createClient } from 'redis'
 import Logger from '../core/Logger'
 
+//const redis = require('redis')
+//const client = redis.createClient({
+//  host: process.env.AZURE_CACHE_FOR_REDIS_HOST_NAME,
+//  password: process.env.AZURE_CACHE_FOR_REDIS_ACCESS_KEY
+//})
+//
+//client.on('error', (err) => {
+//  console.error('Error connecting to Redis:', err)
+//})
+//
+//client.set('key', 'value', redis.print)
+//client.get('key', (err, reply) => {
+//  console.log(reply) // Will print 'value'
+//})
+//
+
 export const redis = createClient({
   url: process.env.REDIS_URL
 })
