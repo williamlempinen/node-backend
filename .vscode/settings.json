@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/a02bf5d1-66de-4148-850d-bff21efbcdaf/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/ZatChat",
+  "appService.deploySubpath": "."
+}
