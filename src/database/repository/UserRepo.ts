@@ -15,7 +15,7 @@ const UserRepo = {
   // USE ONLY IN THIS SCOPE
   async findByEmail(email: string): Promise<(User & { contacts: Contact[] }) | null> {
     try {
-      const user = await prisma.user.findFirst({ where: { email: email }, include: { contacts: true } })
+      const user = await prisma.user.findUnique({ where: { email: email }, include: { contacts: true } })
       if (!user) return null
 
       return user
