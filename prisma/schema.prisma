@@ -76,12 +76,12 @@ model Conversation {
 }
 
 
-// contacts could have username and a profile picture
 model Contact {
   id         Int      @id @default(autoincrement())
   user_id    Int
   contact_id Int
   created_at DateTime @default(now()) @db.Timestamp(6)
+  username   String?  @db.VarChar(54)
 
   user    User @relation("UserContacts", fields: [user_id], references: [id])
   contact User @relation("AsContacts", fields: [contact_id], references: [id])

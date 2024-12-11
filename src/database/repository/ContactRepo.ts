@@ -3,6 +3,7 @@ import Logger from '../../core/Logger'
 import { ErrorType } from '../../core/errors'
 import { prismaClient as prisma } from '..'
 import { ContactDTO } from '../models/ContactDTO'
+import UserRepo from './UserRepo'
 
 type ContactPairType = {
   userId: string
@@ -12,10 +13,14 @@ type ContactPairType = {
 const ContactRepo = {
   async createContact(data: ContactPairType): Promise<RepoResponse<ContactDTO>> {
     try {
+      const [contactsUser, error] = await UserRepo.findById(parseInt(data.contactId))
+      if (error) return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Such a contact user does not exist' }]
+
       const createdContact = await prisma.contact.create({
         data: {
           user_id: parseInt(data.userId),
-          contact_id: parseInt(data.contactId)
+          contact_id: parseInt(data.contactId),
+          username: contactsUser?.username
         }
       })
       if (!createdContact) return [null, { type: ErrorType.BAD_REQUEST, errorMessage: 'Could not create contact' }]
