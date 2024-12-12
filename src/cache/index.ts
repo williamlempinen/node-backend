@@ -1,25 +1,16 @@
 import { createClient } from 'redis'
 import Logger from '../core/Logger'
+import { REDIS_ACCESS_KEY_PRIMARY, REDIS_URL, REDIS_URL_AZ, REDIS_USERNAME_AZ } from '../config'
 
-//const redis = require('redis')
-//const client = redis.createClient({
-//  host: process.env.AZURE_CACHE_FOR_REDIS_HOST_NAME,
-//  password: process.env.AZURE_CACHE_FOR_REDIS_ACCESS_KEY
-//})
-//
-//client.on('error', (err) => {
-//  console.error('Error connecting to Redis:', err)
-//})
-//
-//client.set('key', 'value', redis.print)
-//client.get('key', (err, reply) => {
-//  console.log(reply) // Will print 'value'
-//})
-//
-
+// LOCAL DEV ENVIRONMENT
 export const redis = createClient({
-  url: process.env.REDIS_URL
+  url: REDIS_URL
 })
+
+//export const redis = createClient({
+//  url: REDIS_URL_AZ,
+//  password: REDIS_ACCESS_KEY_PRIMARY
+//})
 
 export const connectRedis = async () => {
   try {

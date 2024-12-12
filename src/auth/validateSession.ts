@@ -2,9 +2,7 @@ import express from 'express'
 import { ValidationSource, validator } from '../core/validator'
 import { Auth } from './schema'
 import { asyncHandler } from '../core/asyncHandler'
-import Logger from '../core/Logger'
 import { ErrorType } from '../core/errors'
-import { redisGet } from '../cache/repository'
 import { SuccessResponse } from '../core/responses'
 import UserRepo from '../database/repository/UserRepo'
 import { verifyJwtToken } from './JWT'
@@ -15,19 +13,8 @@ router.post(
   '/validate-session',
   validator(Auth.validate, ValidationSource.BODY, 'valiate-session'),
   asyncHandler(async (request, response, next) => {
-    const { sessionId } = request.body
-
-    if (!sessionId) {
-      Logger.error('No session id present')
-      return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })
-    }
-
-    const isValidSession = await redisGet(sessionId)
-    if (!isValidSession || !JSON.parse(isValidSession).accessToken || !JSON.parse(isValidSession).refreshToken)
-      return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })
-
-    const accessToken = JSON.parse(isValidSession).accessToken
-    const refreshToken = JSON.parse(isValidSession).refreshToken
+    const { accessToken, refreshToken } = request.body
+    if (!accessToken || !refreshToken) return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })
 
     const decodedToken = verifyJwtToken(accessToken)
     if (!decodedToken || !decodedToken.id) return next({ type: ErrorType.UNAUTHORIZED, errorMessage: 'Unauthorized' })

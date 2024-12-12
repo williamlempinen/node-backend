@@ -6,7 +6,6 @@ import RefreshTokenRepo from '../../database/repository/RefreshTokenRepo'
 import { validator } from '../../core/validator'
 import { Access } from './schema'
 import UserRepo from '../../database/repository/UserRepo'
-import { redisDelete, redisGet } from '../../cache/repository'
 import { verifyJwtToken } from '../../auth/JWT'
 import Logger from '../../core/Logger'
 
@@ -16,13 +15,12 @@ router.post(
   '/logout',
   validator(Access.logout),
   asyncHandler(async (request, response, next) => {
-    const { sessionId } = request.body
-    if (!sessionId) return next({ type: ErrorType.BAD_REQUEST, message: 'Session id is required' })
+    const { accessToken, refreshToken } = request.body
 
-    const cachedData = await redisGet(sessionId)
-    if (!cachedData) return next({ type: ErrorType.INTERNAL, message: 'Token not found from sessions' })
+    if (!accessToken || !refreshToken)
+      return next({ type: ErrorType.INTERNAL, message: 'Token not found from sessions' })
 
-    const decodedToken = verifyJwtToken(JSON.parse(cachedData).accessToken)
+    const decodedToken = verifyJwtToken(accessToken)
     if (!decodedToken || !decodedToken.id)
       return next({ type: ErrorType.INTERNAL, message: 'Token not found from sessions' })
 
@@ -38,7 +36,6 @@ router.post(
     // --------------------------------------------------------------------------
     response.clearCookie('accessToken', { httpOnly: true, sameSite: 'strict' })
     response.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict' })
-    redisDelete(sessionId)
     // --------------------------------------------------------------------------
     return SuccessResponse('Logout succeeded', response)
   })

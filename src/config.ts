@@ -11,5 +11,6 @@ export const REDIS_URL = process.env.REDIS_URL!
 export const DATABASE_URL_AZ = process.env.DATABASE_URL_AZ!
 export const REDIS_HOST_AZ = process.env.REDIS_HOST_AZ!
 export const REDIS_PORT_AZ = process.env.REDIS_PORT_AZ!
+export const REDIS_USERNAME_AZ = process.env.REDIS_USERNAME_AZ
 export const REDIS_URL_AZ = process.env.REDIS_URL_AZ!
 export const REDIS_ACCESS_KEY_PRIMARY = process.env.REDIS_ACCESS_KEY_PRIMARY!

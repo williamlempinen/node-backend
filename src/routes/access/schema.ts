@@ -11,7 +11,8 @@ export const Access = {
     password: z.string().min(8, 'Password must be at least 8 characters long')
   }),
   logout: z.object({
-    sessionId: z.string().min(1)
+    accessToken: z.string().min(1),
+    refreshToken: z.string().min(1)
   }),
   refreshToken: z.object({
     email: z.string().email('Invalid email'),
