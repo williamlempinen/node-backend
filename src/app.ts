@@ -3,7 +3,6 @@ import Logger from './core/Logger'
 import cors from 'cors'
 import rootRouter from './routes'
 import { connectToDatabase } from './database'
-import { connectRedis } from './cache'
 import errorMiddleware from './core/errorMiddleware'
 import { deleteExpiredRefreshTokens } from './auth/authUtils'
 import helmet from 'helmet'
@@ -23,7 +22,6 @@ app.use(express.urlencoded({ extended: true }))
 
 // ----------- CONNECTIONS -------------
 connectToDatabase()
-connectRedis()
 // -------------------------------------
 
 // ------------- ROUTER ----------------

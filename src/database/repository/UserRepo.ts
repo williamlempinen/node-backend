@@ -7,9 +7,6 @@ import { UserLogin } from '../../routes/access/schema'
 import { Paginated, PaginatedSearchQuery, RepoResponse } from 'types'
 import { ErrorType } from '../../core/errors'
 import RefreshTokenRepo from './RefreshTokenRepo'
-import { redisGet, redisSet } from '../../cache/repository'
-import { HOUR_NUM } from '../../constants'
-import { type } from 'os'
 
 const UserRepo = {
   // USE ONLY IN THIS SCOPE
@@ -116,8 +113,6 @@ const UserRepo = {
         Logger.error('Error updating user status')
         return [null, { type: ErrorType.INTERNAL, errorMessage: 'Could not update user status' }]
       }
-
-      await redisSet(sessionId, JSON.stringify({ accessToken, refreshToken }), HOUR_NUM)
 
       return [{ user: userDTO, accessToken, refreshToken, sessionId }, null]
     } catch (error: any) {
