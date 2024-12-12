@@ -5,25 +5,24 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL_AZ")
 }
 
 model User {
-  id                  Int      @id @default(autoincrement())
-  username            String   @unique @db.VarChar(54)
-  email               String   @unique @db.VarChar(100)
-  password            String   @db.Text
-  is_active           Boolean  @default(true)
-  created_at          DateTime @default(now()) @db.Timestamp(6)
-  role                String   @default("REGULAR") @db.VarChar(20)
-  profile_picture_url String?  @db.Text
-  updated_at          DateTime @updatedAt @db.Timestamp(6)
-
-  refreshToken  RefreshToken?  @relation("UserRefreshToken")
-  messages      Message[]      @relation("UserSentMessages")
-  conversations Conversation[] @relation("UserConversations")
-  contacts      Contact[]      @relation("UserContacts")
-  asContacts    Contact[]      @relation("AsContacts")
+  id                  Int            @id @default(autoincrement())
+  username            String         @unique @db.VarChar(54)
+  email               String         @unique @db.VarChar(100)
+  password            String
+  is_active           Boolean        @default(true)
+  created_at          DateTime       @default(now()) @db.Timestamp(6)
+  role                String         @default("REGULAR") @db.VarChar(20)
+  profile_picture_url String?
+  updated_at          DateTime       @updatedAt @db.Timestamp(6)
+  asContacts          Contact[]      @relation("AsContacts")
+  contacts            Contact[]      @relation("UserContacts")
+  messages            Message[]      @relation("UserSentMessages")
+  refreshToken        RefreshToken?  @relation("UserRefreshToken")
+  conversations       Conversation[] @relation("UserConversations")
 
   @@index([email], map: "index_users_email")
   @@index([username], map: "index_users_username")
@@ -33,48 +32,41 @@ model User {
 model RefreshToken {
   id         Int      @id @default(autoincrement())
   user_id    Int      @unique
-  token_hash String   @db.Text
+  token_hash String
   expires_at DateTime @db.Timestamp(6)
   created_at DateTime @default(now()) @db.Timestamp(6)
-
-  user User @relation("UserRefreshToken", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user       User     @relation("UserRefreshToken", fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id], map: "idx_refresh_tokens_user_id")
   @@map("refresh_tokens")
 }
 
 model Message {
-  id              Int      @id @default(autoincrement())
-  content         String   @db.VarChar(300)
-  created_at      DateTime @default(now()) @db.Timestamp(6)
+  id              Int          @id @default(autoincrement())
+  content         String       @db.VarChar(300)
+  created_at      DateTime     @default(now()) @db.Timestamp(6)
   sender_id       Int
-  is_seen         Boolean  @default(false)
-  is_seen_by      Int[]    @default([])
+  is_seen         Boolean      @default(false)
   conversation_id Int
-
-  conversation Conversation @relation("ConversationMessages", fields: [conversation_id], references: [id], onDelete: Cascade)
-  senderUser   User         @relation("UserSentMessages", fields: [sender_id], references: [id])
+  is_seen_by      Int[]        @default([])
+  conversation    Conversation @relation("ConversationMessages", fields: [conversation_id], references: [id], onDelete: Cascade)
+  senderUser      User         @relation("UserSentMessages", fields: [sender_id], references: [id])
 
   @@map("messages")
 }
 
-
-// should also have field indicating how many new messages there are
-// i.e. amoun of messages user has not read
 model Conversation {
-  id           Int      @id @default(autoincrement())
-  is_group     Boolean  @default(false)
-  created_at   DateTime @default(now()) @db.Timestamp(6)
-  updated_at   DateTime @updatedAt @db.Timestamp(6)
-  group_name   String   @db.VarChar(300)
-  unread_count Int      @default(0)   
-
+  id           Int       @id @default(autoincrement())
+  is_group     Boolean   @default(false)
+  created_at   DateTime  @default(now()) @db.Timestamp(6)
+  updated_at   DateTime  @updatedAt @db.Timestamp(6)
+  group_name   String    @db.VarChar(300)
+  unread_count Int       @default(0)
   messages     Message[] @relation("ConversationMessages")
   participants User[]    @relation("UserConversations")
 
   @@map("conversations")
 }
-
 
 model Contact {
   id         Int      @id @default(autoincrement())
@@ -82,9 +74,8 @@ model Contact {
   contact_id Int
   created_at DateTime @default(now()) @db.Timestamp(6)
   username   String?  @db.VarChar(54)
-
-  user    User @relation("UserContacts", fields: [user_id], references: [id])
-  contact User @relation("AsContacts", fields: [contact_id], references: [id])
+  contact    User     @relation("AsContacts", fields: [contact_id], references: [id])
+  user       User     @relation("UserContacts", fields: [user_id], references: [id])
 
   @@unique([user_id, contact_id], map: "unique_contacts")
   @@map("contacts")
