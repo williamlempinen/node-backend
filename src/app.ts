@@ -1,5 +1,4 @@
 import express from 'express'
-import Logger from './core/Logger'
 import cors from 'cors'
 import rootRouter from './routes'
 import { connectToDatabase } from './database'
@@ -13,7 +12,10 @@ app.use(helmet())
 
 app.use(
   cors({
-    origin: 'http://localhost:3000' // development
+    origin: [
+      'http://localhost:3000', // development
+      'zatchat.azurewebsites.net'
+    ]
   })
 )
 

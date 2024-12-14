@@ -6,7 +6,7 @@ import Logger from '../../core/Logger'
 import authenticate from '../../auth/authenticate'
 import ConversationRepo from '../../database/repository/ConversationRepo'
 import { SuccessResponse } from '../../core/responses'
-import { HOUR_STR } from '../../constants'
+import { HOUR_NUM, HOUR_STR } from '../../constants'
 
 const router = express.Router()
 

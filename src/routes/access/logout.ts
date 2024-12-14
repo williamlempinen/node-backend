@@ -25,7 +25,7 @@ router.post(
       return next({ type: ErrorType.INTERNAL, message: 'Token not found from sessions' })
 
     Logger.warn('DECODED TOKEN: ', decodedToken)
-
+    await UserRepo.updateUserIsActive(decodedToken.id, false)
     const [isRefreshTokenDeleted, error] = await RefreshTokenRepo.deleteByUserId(decodedToken.id)
     if (error) return next({ type: error.type, message: error.errorMessage })
 

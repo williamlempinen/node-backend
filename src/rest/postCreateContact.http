@@ -2,6 +2,6 @@ POST http://localhost:8000/contact/create-contact
 Content-Type: application/json
 
 {
-  "userId": 7,
-  "contactId": 8
+  "userId": "1",
+  "contactId": "2"
 }

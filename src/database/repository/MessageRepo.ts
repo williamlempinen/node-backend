@@ -4,8 +4,6 @@ import { ErrorType } from '../../core/errors'
 import { prismaClient as prisma } from '..'
 import { MessageDTO } from '../models/MessageDTO'
 import ConversationRepo from './ConversationRepo'
-import { Primitive } from 'zod'
-import { type } from 'os'
 
 type MessageDataType = {
   content: string

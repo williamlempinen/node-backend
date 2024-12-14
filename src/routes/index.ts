@@ -30,7 +30,7 @@ import Logger from '../core/Logger'
 const rootRouter = express.Router()
 
 rootRouter.get('/', async (request: Request, response: Response) => {
-  response.send(`Hello world in router root index.ts. Is this is Azure??`)
+  response.send(`Hello world in router root index.ts. In AZURE?`)
 })
 
 // ------------------ ACCESS ---------------------
