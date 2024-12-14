@@ -14,7 +14,7 @@ app.use(
   cors({
     origin: [
       'http://localhost:3000', // development
-      'zatchat.azurewebsites.net'
+      'https://zatchat.azurewebsites.net'
     ]
   })
 )
