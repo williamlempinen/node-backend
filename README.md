@@ -12,3 +12,4 @@ Backend for ZatChat application.
 
 
 ### Running locally
+- docker setup not working
