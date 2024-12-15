@@ -15,7 +15,7 @@ ENV NODE_ENV=production
 COPY --from=builder /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/package*.json ./
 COPY --from=builder /usr/src/app/prisma ./prisma
-COPY .env .env
+COPY --from=builder /usr/src/app/.env .env
 RUN npm ci --omit=dev
 EXPOSE 8000
 CMD ["node", "build/server.js"]
