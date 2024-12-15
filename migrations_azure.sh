@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
-    echo "Usage: $0 <database_password>"
-    exit 1
-fi
-
 DB_HOST="$1"
 DB_PORT="$2"
 DB_NAME="$3"

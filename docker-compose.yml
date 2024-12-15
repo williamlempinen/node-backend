@@ -20,9 +20,6 @@ services:
     container_name: node-server
     ports:
       - '${PORT}:8000'
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     depends_on:
       - postgres
     environment:
