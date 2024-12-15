@@ -14,14 +14,6 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
 
-  redis:
-    image: redis
-    container_name: redis_dev
-    ports:
-      - '${REDIS_PORT}:6379'
-    volumes:
-      - redis-data:/data
-
   node-server:
     build:
       context: .
@@ -32,16 +24,13 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      - redis
       - postgres
     environment:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_DATABASE: ${DB_DATABASE}
       DATABASE_URL: ${DATABASE_URL_POSTGRES}
-      REDIS_URL: ${REDIS_URL_REDIS}
       JWT_SECRET: ${JWT_SECRET}
 
 volumes:
-  redis-data:
   postgres-data:
