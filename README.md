@@ -1,13 +1,15 @@
-# Express backed for chatting
+# Express backed for chat application ZatChat
 
-- working on this atm
+This project is currently on development.
 
-Backend for the ZarChat application, made with React
+Backend for ZatChat application.
+
+#### Tech stack:
+- NodeJs with TypeScript
+- Express server
+- Prisma ORM and Postgres
+- <s>Redis</s>
 
 
-#### todo
-
-
-- cache
-- handling token refresh/auth
-- update schema to have list of users who have/have not seen a message
+### Running locally
+- docker setup not working
