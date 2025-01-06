@@ -12,6 +12,7 @@ router.post(
   '/login',
   validator(Access.login),
   asyncHandler(async (request, response, next) => {
+    Logger.info('Login route')
     const [data, error] = await UserRepo.login(request.body)
 
     if (error) {
