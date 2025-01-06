@@ -10,6 +10,3 @@ Backend for ZatChat application.
 - Prisma ORM and Postgres
 - <s>Redis</s>
 
-
-### Running locally
-- docker setup not working

@@ -12,8 +12,11 @@ const UserRepo = {
   // USE ONLY IN THIS SCOPE
   async findByEmail(email: string): Promise<(User & { contacts: Contact[] }) | null> {
     try {
+      Logger.info('Find by email with: ', email)
       const user = await prisma.user.findUnique({ where: { email: email }, include: { contacts: true } })
       if (!user) return null
+
+      Logger.info('Found user: ', JSON.stringify(user))
 
       return user
     } catch (error: any) {
@@ -80,6 +83,8 @@ const UserRepo = {
     data: UserLogin
   ): Promise<RepoResponse<{ user: UserDTO; accessToken: string; refreshToken: string; sessionId: string }>> {
     try {
+      Logger.info(`Login in repo with data: ${data}`)
+
       const user = await UserRepo.findByEmail(data.email)
       if (!user) {
         Logger.error(`No user found with email: ${data.email}`)
