@@ -1,8 +1,0 @@
-POST https://zatchat-api.azurewebsites.net/access/signup
-Content-Type: application/json
-
-{
-"username": "superhessu",
-"email": "superhessu@example.com",
-"password": "superhessu123"
-}
